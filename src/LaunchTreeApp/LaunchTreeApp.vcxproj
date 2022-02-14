@@ -22,6 +22,11 @@
     <AppxGeneratePriEnabled>true</AppxGeneratePriEnabled>
     <ProjectPriIndexName>App</ProjectPriIndexName>
     <AppxPackage>true</AppxPackage>
+    <!--
+      For some reason, DisableEmbeddedXbf is key to making WAP packaging work.
+      See https://github.com/microsoft/terminal/pull/1900
+    -->
+    <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
