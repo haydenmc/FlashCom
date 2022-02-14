@@ -1,14 +1,20 @@
 ﻿#pragma once
-#include "App.xaml.g.h"
+#include "App.g.h"
+#include "App.base.h"
 
 namespace winrt::LaunchTreeApp::implementation
 {
-    struct App : AppT<App>
+    class App : public AppT2<App>
     {
+    public:
         App();
+        ~App();
+    };
+}
 
-        void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs const&);
-        void OnSuspending(IInspectable const&, Windows::ApplicationModel::SuspendingEventArgs const&);
-        void OnNavigationFailed(IInspectable const&, Windows::UI::Xaml::Navigation::NavigationFailedEventArgs const&);
+namespace winrt::LaunchTreeApp::factory_implementation
+{
+    class App : public AppT<App, implementation::App>
+    {
     };
 }
