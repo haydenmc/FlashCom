@@ -13,19 +13,4 @@ namespace winrt::LaunchTreeApp::implementation
     {
         InitializeComponent();
     }
-
-    int32_t LaunchTreeControl::MyProperty()
-    {
-        throw hresult_not_implemented();
-    }
-
-    void LaunchTreeControl::MyProperty(int32_t /* value */)
-    {
-        throw hresult_not_implemented();
-    }
-
-    void LaunchTreeControl::ClickHandler(IInspectable const&, RoutedEventArgs const&)
-    {
-        Button().Content(box_value(L"Clicked"));
-    }
 }

@@ -57,7 +57,7 @@ ATOM RegisterWindowClass(
         .hInstance = hInstance,
         .hIcon = nullptr,
         .hCursor = LoadCursorW(nullptr, IDC_ARROW),
-        .hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),
+        .hbrBackground = nullptr,
         .lpszMenuName = nullptr,
         .lpszClassName = c_windowClass.data(),
     };
@@ -70,16 +70,16 @@ bool InitInstance(
     int nCmdShow
 )
 {
-    g_hInstance = hInstance; // Store instance handle in our global variable
+    g_hInstance = hInstance;
 
     HWND hWnd = CreateWindowW(
         c_windowClass.data(),
         c_windowTitle.data(),
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT,
+        WS_POPUP,
         0,
-        CW_USEDEFAULT,
         0,
+        400,
+        800,
         nullptr,
         nullptr,
         hInstance,
@@ -97,8 +97,8 @@ bool InitInstance(
         auto interop{ g_desktopWindowXamlSource.as<IDesktopWindowXamlSourceNative>() };
         winrt::check_hresult(interop->AttachToWindow(hWnd));
         HWND hWndXamlIsland{ nullptr };
-        winrt::check_hresult(interop->get_WindowHandle(&hWndXamlIsland)); \
-            RECT windowRect;
+        winrt::check_hresult(interop->get_WindowHandle(&hWndXamlIsland));
+        RECT windowRect;
         ::GetWindowRect(hWnd, &windowRect);
         ::SetWindowPos(
             hWndXamlIsland,
@@ -128,14 +128,6 @@ LRESULT CALLBACK WndProc(
 {
     switch (message)
     {
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         if (g_desktopWindowXamlSource)

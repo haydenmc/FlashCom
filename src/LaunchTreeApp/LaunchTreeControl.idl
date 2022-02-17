@@ -4,6 +4,5 @@ namespace LaunchTreeApp
     runtimeclass LaunchTreeControl : Windows.UI.Xaml.Controls.UserControl
     {
         LaunchTreeControl();
-        Int32 MyProperty;
     }
 }
