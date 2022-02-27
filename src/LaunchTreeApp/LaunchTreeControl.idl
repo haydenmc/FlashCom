@@ -1,8 +1,0 @@
-namespace LaunchTreeApp
-{
-    [default_interface]
-    runtimeclass LaunchTreeControl : Windows.UI.Xaml.Controls.UserControl
-    {
-        LaunchTreeControl();
-    }
-}
