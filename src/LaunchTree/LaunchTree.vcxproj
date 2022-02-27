@@ -102,10 +102,12 @@
     <None Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp" />
     <ClCompile Include="View\CompositionHost.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Input\LowLevelKeyboardHookHelper.h" />
     <ClInclude Include="View\CompositionHost.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

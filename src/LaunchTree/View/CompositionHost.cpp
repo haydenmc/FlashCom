@@ -65,7 +65,7 @@ namespace
 #pragma endregion Free functions
 }
 
-namespace Hud
+namespace LaunchTree::View
 {
 #pragma region Public
     CompositionHost::CompositionHost(HWND hWnd) :

@@ -1,5 +1,6 @@
 #include <pch.h>
 
+#include "Input/LowLevelKeyboardHookHelper.h"
 #include "View/CompositionHost.h"
 
 #include <iostream>
@@ -7,10 +8,10 @@
 
 namespace
 {
-    constexpr std::wstring_view c_windowTitle{ L"Hud" };
-    constexpr std::wstring_view c_windowClass{ L"HudWindowClass" };
+    constexpr std::wstring_view c_windowTitle{ L"LaunchTree" };
+    constexpr std::wstring_view c_windowClass{ L"LaunchTreeWindowClass" };
     HINSTANCE g_hInstance;
-    std::unique_ptr<Hud::CompositionHost> c_compositionHost{ nullptr };
+    std::unique_ptr<LaunchTree::View::CompositionHost> c_compositionHost{ nullptr };
 }
 
 // Forward declarations
@@ -46,8 +47,36 @@ int Run(HINSTANCE hInstance)
 {
     winrt::init_apartment(winrt::apartment_type::single_threaded);
 
+    LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(
+        [](WPARAM wParam, KBDLLHOOKSTRUCT* kb)
+        {
+            switch (wParam)
+            {
+            case WM_SYSKEYDOWN:
+                ::OutputDebugStringW(L"SYSKEYDOWN: ");
+                break;
+            case WM_KEYDOWN:
+                ::OutputDebugStringW(L"KEYDOWN: ");
+                break;
+            case WM_SYSKEYUP:
+                ::OutputDebugStringW(L"SYSKEYUP: ");
+                break;
+            case WM_KEYUP:
+                ::OutputDebugStringW(L"KEYUP: ");
+                break;
+            }
+
+            ::OutputDebugStringW(std::to_wstring(kb->vkCode).c_str());
+            ::OutputDebugStringW(L"\n");
+        }
+    );
+
     RegisterWindowClass(hInstance);
     InitializeWindow(hInstance);
+
+    ::OutputDebugStringW(L"HELLO WORLD");
+
+    
 
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -104,9 +133,10 @@ void InitializeWindow(HINSTANCE hInstance)
     SetWindowStyles(hWnd);
     AdjustWindowSize(hWnd);
     ShowWindow(hWnd, SW_SHOW);
-    UpdateWindow(hWnd);
+    SetWindowStyles(hWnd);
+    AdjustWindowSize(hWnd);
 
-    c_compositionHost = std::make_unique<Hud::CompositionHost>(hWnd);
+    c_compositionHost = std::make_unique<LaunchTree::View::CompositionHost>(hWnd);
 }
 
 void AdjustWindowSize(HWND hWnd)
@@ -150,7 +180,8 @@ void SetWindowStyles(HWND hWnd)
         WS_EX_TOPMOST |    // Always on top
         WS_EX_TRANSPARENT  // Make layered window clickthrough
     };
-    SetWindowLongW(hWnd, GWL_EXSTYLE, newStyles);
+    LONG result{ SetWindowLongW(hWnd, GWL_EXSTYLE, newStyles) };
+    result;
 }
 
 LRESULT CALLBACK WndProc(

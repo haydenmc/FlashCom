@@ -4,7 +4,7 @@
 #include <winrt/Windows.UI.Composition.h>
 #include <winrt/Windows.UI.Composition.Desktop.h>
 
-namespace Hud
+namespace LaunchTree::View
 {
     class CompositionHost
     {

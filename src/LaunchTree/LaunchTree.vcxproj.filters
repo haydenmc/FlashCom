@@ -33,6 +33,9 @@
     <ClCompile Include="View\CompositionHost.cpp">
       <Filter>Source Files\View</Filter>
     </ClCompile>
+    <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -40,6 +43,9 @@
     </ClInclude>
     <ClInclude Include="View\CompositionHost.h">
       <Filter>Header Files\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\LowLevelKeyboardHookHelper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
