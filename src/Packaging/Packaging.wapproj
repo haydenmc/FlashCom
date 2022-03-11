@@ -77,6 +77,11 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LaunchTree\LaunchTree.vcxproj" />
+    <ProjectReference Include="..\LaunchTree\LaunchTree.vcxproj">
+      <Private>True</Private>
+      <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
+        <IncludeAssets>fmtd.dll</IncludeAssets>
+      <PrivateAssets>fmtd.dll</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 </Project>

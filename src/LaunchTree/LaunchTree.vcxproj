@@ -33,6 +33,10 @@
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgManifestInstall>true</VcpkgManifestInstall>
+    <VcpkgAutoLink>true</VcpkgAutoLink>
   </PropertyGroup>
   <ItemDefinitionGroup Label="GlobalDefinitions">
     <ClCompile>
