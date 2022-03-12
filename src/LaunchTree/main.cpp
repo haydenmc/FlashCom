@@ -5,17 +5,24 @@
 
 #include <iostream>
 #include <memory>
+#include <unordered_set>
+#include <vector>
 
 namespace
 {
     constexpr std::wstring_view c_windowTitle{ L"LaunchTree" };
     constexpr std::wstring_view c_windowClass{ L"LaunchTreeWindowClass" };
     HINSTANCE g_hInstance;
-    std::unique_ptr<LaunchTree::View::CompositionHost> c_compositionHost{ nullptr };
+    std::unique_ptr<LaunchTree::View::CompositionHost> g_compositionHost{ nullptr };
+    HWND g_hWnd;
+    const std::unordered_set<uint32_t> c_hotkeyCombo { VK_LWIN, VK_SPACE };
+    std::unordered_set<uint32_t> g_hotkeysPressed;
 }
 
 // Forward declarations
 int Run(HINSTANCE hInstance);
+void HandleKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb);
+void OnHotkeyPress();
 ATOM RegisterWindowClass(HINSTANCE hInstance);
 void InitializeWindow(HINSTANCE hInstance);
 void AdjustWindowSize(HWND hWnd);
@@ -50,29 +57,7 @@ int Run(HINSTANCE hInstance)
     RegisterWindowClass(hInstance);
     InitializeWindow(hInstance);
 
-    LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(
-        [](WPARAM wParam, KBDLLHOOKSTRUCT* kb)
-        {
-            switch (wParam)
-            {
-            case WM_SYSKEYDOWN:
-                ::OutputDebugStringW(L"SYSKEYDOWN: ");
-                break;
-            case WM_KEYDOWN:
-                ::OutputDebugStringW(L"KEYDOWN: ");
-                break;
-            case WM_SYSKEYUP:
-                ::OutputDebugStringW(L"SYSKEYUP: ");
-                break;
-            case WM_KEYUP:
-                ::OutputDebugStringW(L"KEYUP: ");
-                break;
-            }
-
-            ::OutputDebugStringW(std::to_wstring(kb->vkCode).c_str());
-            ::OutputDebugStringW(L"\n");
-        }
-    );
+    LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(HandleKeyboardInput);
 
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -82,6 +67,63 @@ int Run(HINSTANCE hInstance)
     }
 
     return (int)msg.wParam;
+}
+
+void HandleKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
+{
+    // Ignore non-hotkey keys
+    if (c_hotkeyCombo.count(kb->vkCode) == 0)
+    {
+        return;
+    }
+
+    bool isKeyDown{ false };
+    switch (wParam)
+    {
+    case WM_SYSKEYDOWN:
+        __fallthrough;
+    case WM_KEYDOWN:
+        isKeyDown = true;
+        break;
+    case WM_SYSKEYUP:
+        __fallthrough;
+    case WM_KEYUP:
+        isKeyDown = false;
+        break;
+    default:
+        return;
+    }
+
+    if (isKeyDown)
+    {
+        g_hotkeysPressed.insert(kb->vkCode);
+    }
+    else
+    {
+        g_hotkeysPressed.erase(kb->vkCode);
+    }
+
+    if (g_hotkeysPressed.size() == c_hotkeyCombo.size())
+    {
+        OnHotkeyPress();
+    }
+}
+
+void OnHotkeyPress()
+{
+    if (!g_hWnd)
+    {
+        return;
+    }
+
+    if (IsWindowVisible(g_hWnd))
+    {
+        ShowWindow(g_hWnd, SW_HIDE);
+    }
+    else
+    {
+        ShowWindow(g_hWnd, SW_SHOW);
+    }
 }
 
 ATOM RegisterWindowClass(HINSTANCE hInstance)
@@ -107,7 +149,7 @@ void InitializeWindow(HINSTANCE hInstance)
 {
     g_hInstance = hInstance;
 
-    HWND hWnd = CreateWindowW(
+    g_hWnd = CreateWindowW(
         c_windowClass.data(),
         c_windowTitle.data(),
         WS_POPUP,
@@ -121,18 +163,18 @@ void InitializeWindow(HINSTANCE hInstance)
         nullptr
     );
 
-    if (!hWnd)
+    if (!g_hWnd)
     {
         throw std::runtime_error("Could not create window!");
     }
 
-    SetWindowStyles(hWnd);
-    AdjustWindowSize(hWnd);
-    ShowWindow(hWnd, SW_SHOW);
-    SetWindowStyles(hWnd);
-    AdjustWindowSize(hWnd);
+    SetWindowStyles(g_hWnd);
+    AdjustWindowSize(g_hWnd);
+    ShowWindow(g_hWnd, SW_SHOW);
+    SetWindowStyles(g_hWnd);
+    AdjustWindowSize(g_hWnd);
 
-    c_compositionHost = std::make_unique<LaunchTree::View::CompositionHost>(hWnd);
+    g_compositionHost = std::make_unique<LaunchTree::View::CompositionHost>(g_hWnd);
 }
 
 void AdjustWindowSize(HWND hWnd)
