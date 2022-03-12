@@ -28,7 +28,6 @@ int main(
     wchar_t* /*argv*/[]
 )
 {
-    SPDLOG_TRACE("Starting process from Console entrypoint");
     return Run(GetModuleHandleW(nullptr));
 }
 
@@ -40,14 +39,12 @@ int WINAPI wWinMain(
     int /*nCmdShow*/
 )
 {
-    SPDLOG_TRACE("Starting process from Windows entrypoint");
     return Run(hInstance);
 }
 
 // Initializes window and runs the message loop
 int Run(HINSTANCE hInstance)
 {
-    spdlog::trace("Run");
     winrt::init_apartment(winrt::apartment_type::single_threaded);
 
     RegisterWindowClass(hInstance);
