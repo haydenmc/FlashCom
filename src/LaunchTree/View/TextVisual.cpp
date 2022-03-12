@@ -36,8 +36,6 @@ namespace
         };
         textLayout.WordWrapping(winrt::MGCT::CanvasWordWrapping::NoWrap);
         auto textBounds{ textLayout.LayoutBounds() };
-        /*auto textGeometry{ winrt::MGCG::CanvasGeometry::CreateText(textLayout) };
-        auto textBounds{ textGeometry.ComputeBounds() };*/
 
         // Draw text
         auto drawingSurface{
