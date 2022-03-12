@@ -1,11 +1,10 @@
 #include <pch.h>
 
 #include "CompositionHost.h"
+#include "TextVisual.h"
 
 #include <DispatcherQueue.h>
 #include <windows.ui.composition.interop.h>
-
-#include <winrt/Microsoft.Graphics.Canvas.h>
 #include <winrt/Microsoft.Graphics.Canvas.Effects.h>
 #include <winrt/Microsoft.Graphics.Canvas.Text.h>
 #include <winrt/Microsoft.Graphics.Canvas.UI.Composition.h>
@@ -16,16 +15,16 @@ namespace winrt
 {
     namespace MGC = Microsoft::Graphics::Canvas;
     namespace MGCE = Microsoft::Graphics::Canvas::Effects;
+    namespace MGCT = Microsoft::Graphics::Canvas::Text;
     namespace MGCUC = Microsoft::Graphics::Canvas::UI::Composition;
-    namespace WGDX = Windows::Graphics::DirectX;
     namespace WS = Windows::System;
     namespace WUIC = Windows::UI::Composition;
     namespace WUICD = Windows::UI::Composition::Desktop;
+    namespace WUIT = Windows::UI::Text;
 }
 
 namespace
 {
-#pragma region Free functions
     inline winrt::WS::DispatcherQueueController CreateDispatcherQueue()
     {
         DispatcherQueueOptions options
@@ -62,7 +61,6 @@ namespace
         ));
         return target;
     }
-#pragma endregion Free functions
 }
 
 namespace LaunchTree::View
@@ -71,7 +69,14 @@ namespace LaunchTree::View
     CompositionHost::CompositionHost(HWND hWnd) :
         m_dispatcherQueueController{ CreateDispatcherQueue() },
         m_compositor{ winrt::WUIC::Compositor{} },
-        m_target{ CreateDesktopWindowTarget(hWnd, m_compositor) }
+        m_target{ CreateDesktopWindowTarget(hWnd, m_compositor) },
+        m_canvasDevice{ winrt::MGC::CanvasDevice::GetSharedDevice() },
+        m_graphicsDevice{
+            winrt::MGCUC::CanvasComposition::CreateCompositionGraphicsDevice(
+                    m_compositor,
+                    m_canvasDevice
+            )
+        }
     {
         auto root{ m_compositor.CreateContainerVisual() };
         root.RelativeSizeAdjustment({ 1.0f, 1.0f });
@@ -136,52 +141,22 @@ namespace LaunchTree::View
             visuals.InsertAtTop(blurVisual);
 
             // Try to render some text with win2d
-            auto canvasDevice{ winrt::MGC::CanvasDevice::GetSharedDevice() };
-            auto compositionGraphicsDevice{
-                winrt::MGCUC::CanvasComposition::CreateCompositionGraphicsDevice(
+            winrt::MGCT::CanvasTextFormat textFormat;
+            textFormat.FontFamily(L"Segoe UI");
+            textFormat.FontSize(64);
+            textFormat.FontWeight(winrt::WUIT::FontWeights::Black());
+            auto textVisual{
+                std::make_unique<TextVisual>(
                     m_compositor,
-                    canvasDevice
+                    m_canvasDevice,
+                    m_graphicsDevice,
+                    textFormat,
+                    L"Hello World!"
                 )
             };
-            auto drawingSurface{
-                compositionGraphicsDevice.CreateDrawingSurface(
-                    { 512, 256 },
-                    winrt::WGDX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-                    winrt::WGDX::DirectXAlphaMode::Premultiplied
-                )
-            };
-
-            auto win2dVisual{ m_compositor.CreateSpriteVisual() };
-            win2dVisual.Brush(m_compositor.CreateSurfaceBrush(drawingSurface));
-            win2dVisual.Size(drawingSurface.Size());
-            win2dVisual.AnchorPoint({ 0.5, 0.5 });
-            win2dVisual.RelativeOffsetAdjustment({ 0.5, 0.5, 0 });
-            visuals.InsertAtTop(win2dVisual);
-
-            {
-                auto drawingSession{
-                    winrt::MGCUC::CanvasComposition::CreateDrawingSession(drawingSurface)
-                };
-                drawingSession.Clear(winrt::Windows::UI::Colors::Transparent());
-
-                winrt::MGC::Text::CanvasTextFormat textFormat{};
-                textFormat.FontFamily(L"Segoe UI");
-                textFormat.FontWeight(winrt::Windows::UI::Text::FontWeights::Black());
-                textFormat.FontSize(64);
-                textFormat.HorizontalAlignment(winrt::MGC::Text::CanvasHorizontalAlignment::Center);
-                textFormat.VerticalAlignment(winrt::MGC::Text::CanvasVerticalAlignment::Center);
-
-                drawingSession.DrawTextW(
-                    L"HELLO WORLD",
-                    { 256, 128 },
-                    { 128, 255, 255, 255 },
-                    textFormat
-                );
-            }
+            visuals.InsertAtTop(textVisual->Visual());
+            m_visuals.push_back(std::move(textVisual));
         }
     }
 #pragma endregion Public
-
-#pragma region Private
-#pragma endregion Private
 }

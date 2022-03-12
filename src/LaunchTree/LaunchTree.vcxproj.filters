@@ -19,6 +19,12 @@
     <Filter Include="Header Files\View">
       <UniqueIdentifier>{090df743-1d99-46b3-9745-3588f05eaa6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{2192883b-abb2-4a8f-bb1e-4ae673be6c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{a2508f0b-7c66-41f2-b28a-1e32789cc44f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -34,7 +40,10 @@
       <Filter>Source Files\View</Filter>
     </ClCompile>
     <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="View\TextVisual.cpp">
+      <Filter>Source Files\View</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,7 +54,13 @@
       <Filter>Header Files\View</Filter>
     </ClInclude>
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="View\ICompositionVisual.h">
+      <Filter>Header Files\View</Filter>
+    </ClInclude>
+    <ClInclude Include="View\TextVisual.h">
+      <Filter>Header Files\View</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -105,11 +105,14 @@
     <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp" />
     <ClCompile Include="View\CompositionHost.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="View\TextVisual.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h" />
     <ClInclude Include="View\CompositionHost.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="View\ICompositionVisual.h" />
+    <ClInclude Include="View\TextVisual.h" />
   </ItemGroup>
   <!-- /Project Contents -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
