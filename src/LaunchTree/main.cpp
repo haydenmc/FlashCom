@@ -1,6 +1,7 @@
 #include <pch.h>
 
 #include "Input/LowLevelKeyboardHookHelper.h"
+#include "Models/TreeNode.h"
 #include "View/CompositionHost.h"
 
 #include <iostream>
@@ -17,12 +18,16 @@ namespace
     HWND g_hWnd;
     const std::unordered_set<uint32_t> c_hotkeyCombo { VK_LWIN, VK_SPACE };
     std::unordered_set<uint32_t> g_hotkeysPressed;
+    std::unordered_set<uint32_t> g_keysPressed;
+    std::unique_ptr<LaunchTree::Models::TreeNode> g_rootNote;
 }
 
 // Forward declarations
 int Run(HINSTANCE hInstance);
-void HandleKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb);
+void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb);
 void OnHotkeyPress();
+void HandleKeyboardMessage(UINT message, WPARAM vkCode);
+void InitializeDataModel();
 ATOM RegisterWindowClass(HINSTANCE hInstance);
 void InitializeWindow(HINSTANCE hInstance);
 void AdjustWindowSize(HWND hWnd);
@@ -54,10 +59,12 @@ int Run(HINSTANCE hInstance)
 {
     winrt::init_apartment(winrt::apartment_type::single_threaded);
 
+    InitializeDataModel();
+
     RegisterWindowClass(hInstance);
     InitializeWindow(hInstance);
 
-    LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(HandleKeyboardInput);
+    LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(HandleLowLevelKeyboardInput);
 
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -69,7 +76,7 @@ int Run(HINSTANCE hInstance)
     return (int)msg.wParam;
 }
 
-void HandleKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
+void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
 {
     // Ignore non-hotkey keys
     if (c_hotkeyCombo.count(kb->vkCode) == 0)
@@ -122,8 +129,58 @@ void OnHotkeyPress()
     }
     else
     {
+        AdjustWindowSize(g_hWnd);
         ShowWindow(g_hWnd, SW_SHOW);
     }
+}
+
+void HandleKeyboardMessage(UINT message, WPARAM wParam)
+{
+    auto vkCode{ static_cast<uint32_t>(wParam) };
+
+    if (message == WM_KEYDOWN)
+    {
+        if (g_keysPressed.count(vkCode) == 0)
+        {
+            ::OutputDebugStringW(std::to_wstring(vkCode).c_str());
+            ::OutputDebugStringW(L" key pressed");
+            g_keysPressed.insert(vkCode);
+        }
+    }
+    else if (message == WM_KEYUP)
+    {
+        g_keysPressed.erase(vkCode);
+    }
+}
+
+void InitializeDataModel()
+{
+    std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>> rootChildren;
+    rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
+        'C',
+        L"Comms",
+        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
+    ));
+    rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
+        'D',
+        L"Dev",
+        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
+    ));
+    rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
+        'G',
+        L"Gaming",
+        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
+    ));
+
+    auto rootNode{
+        std::make_unique<LaunchTree::Models::TreeNode>(
+            '\0',
+            L"",
+            std::move(rootChildren)
+        )
+    };
+
+    g_rootNote = std::move(rootNode);
 }
 
 ATOM RegisterWindowClass(HINSTANCE hInstance)
@@ -215,8 +272,8 @@ void SetWindowStyles(HWND hWnd)
         extendedStyles |
         WS_EX_LAYERED |    // https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features
         WS_EX_TOOLWINDOW | // Don't show in taskbar/switcher
-        WS_EX_TOPMOST |    // Always on top
-        WS_EX_TRANSPARENT  // Make layered window clickthrough
+        WS_EX_TOPMOST //|    // Always on top
+        //WS_EX_TRANSPARENT  // Make layered window clickthrough
     };
     LONG result{ SetWindowLongW(hWnd, GWL_EXSTYLE, newStyles) };
     result;
@@ -231,6 +288,11 @@ LRESULT CALLBACK WndProc(
 {
     switch (message)
     {
+    case WM_KEYDOWN:
+        __fallthrough;
+    case WM_KEYUP:
+        HandleKeyboardMessage(message, wParam);
+        return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
