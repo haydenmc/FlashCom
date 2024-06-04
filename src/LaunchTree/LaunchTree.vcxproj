@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\packages\Microsoft.Windows.CppWinRT.2.0.220131.2\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.220131.2\build\native\Microsoft.Windows.CppWinRT.props')" />
   <!-- Configurations -->
@@ -103,20 +103,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp" />
+    <ClCompile Include="Models\DataModel.cpp" />
     <ClCompile Include="Models\TreeNode.cpp" />
     <ClCompile Include="Settings\SettingsManager.cpp" />
     <ClCompile Include="View\CompositionHost.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="View\TextVisual.cpp" />
+    <ClCompile Include="View\Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h" />
+    <ClInclude Include="Models\DataModel.h" />
     <ClInclude Include="Models\TreeNode.h" />
     <ClInclude Include="Settings\SettingsManager.h" />
     <ClInclude Include="View\CompositionHost.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="View\ICompositionVisual.h" />
     <ClInclude Include="View\TextVisual.h" />
+    <ClInclude Include="View\Ui.h" />
   </ItemGroup>
   <!-- /Project Contents -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -52,7 +52,7 @@ namespace
         drawingSession.DrawTextLayout(
             textLayout,
             { 0, 0 },
-            winrt::WUI::Colors::Red()
+            winrt::WUI::Colors::White()
         );
 
         // Create composition visual

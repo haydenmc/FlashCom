@@ -13,13 +13,13 @@ namespace
 {
     constexpr std::wstring_view c_windowTitle{ L"LaunchTree" };
     constexpr std::wstring_view c_windowClass{ L"LaunchTreeWindowClass" };
-    HINSTANCE g_hInstance;
+    HINSTANCE g_hInstance{ nullptr };
     std::unique_ptr<LaunchTree::View::CompositionHost> g_compositionHost{ nullptr };
-    HWND g_hWnd;
-    const std::unordered_set<uint32_t> c_hotkeyCombo { VK_LWIN, VK_SPACE };
+    HWND g_hWnd{ nullptr };
+    const std::unordered_set<uint32_t> c_hotkeyCombo{ VK_LWIN, VK_SPACE };
     std::unordered_set<uint32_t> g_hotkeysPressed;
     std::unordered_set<uint32_t> g_keysPressed;
-    std::unique_ptr<LaunchTree::Models::TreeNode> g_rootNote;
+    std::unique_ptr<LaunchTree::Models::TreeNode> g_rootNote{ nullptr };
 }
 
 // Forward declarations
@@ -116,6 +116,15 @@ void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
     }
 }
 
+void ForceForegroundWindow(HWND hwnd) {
+    DWORD windowThreadProcessId = GetWindowThreadProcessId(GetForegroundWindow(), LPDWORD(0));
+    DWORD currentThreadId = GetCurrentThreadId();
+    AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+    BringWindowToTop(hwnd);
+    ShowWindow(hwnd, SW_SHOW);
+    AttachThreadInput(windowThreadProcessId, currentThreadId, false);
+}
+
 void OnHotkeyPress()
 {
     if (!g_hWnd)
@@ -131,6 +140,7 @@ void OnHotkeyPress()
     {
         AdjustWindowSize(g_hWnd);
         ShowWindow(g_hWnd, SW_SHOW);
+        ForceForegroundWindow(g_hWnd);
     }
 }
 
@@ -142,8 +152,6 @@ void HandleKeyboardMessage(UINT message, WPARAM wParam)
     {
         if (g_keysPressed.count(vkCode) == 0)
         {
-            ::OutputDebugStringW(std::to_wstring(vkCode).c_str());
-            ::OutputDebugStringW(L" key pressed");
             g_keysPressed.insert(vkCode);
         }
     }
@@ -272,8 +280,8 @@ void SetWindowStyles(HWND hWnd)
         extendedStyles |
         WS_EX_LAYERED |    // https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features
         WS_EX_TOOLWINDOW | // Don't show in taskbar/switcher
-        WS_EX_TOPMOST //|    // Always on top
-        //WS_EX_TRANSPARENT  // Make layered window clickthrough
+        WS_EX_TOPMOST |    // Always on top
+        WS_EX_TRANSPARENT  // Make layered window clickthrough
     };
     LONG result{ SetWindowLongW(hWnd, GWL_EXSTYLE, newStyles) };
     result;
@@ -296,6 +304,16 @@ LRESULT CALLBACK WndProc(
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    case WM_ACTIVATE:
+        if (wParam == WA_INACTIVE)
+        {
+            ::OutputDebugStringW(L"Focus lost.");
+            if (g_hWnd && IsWindowVisible(g_hWnd))
+            {
+                ShowWindow(g_hWnd, SW_HIDE);
+            }
+        }
+        __fallthrough;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

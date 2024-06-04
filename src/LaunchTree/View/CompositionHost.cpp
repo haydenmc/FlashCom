@@ -51,8 +51,7 @@ namespace
     {
         namespace abi = ABI::Windows::UI::Composition::Desktop;
 
-        auto interop = compositor
-            .as<abi::ICompositorDesktopInterop>();
+        auto interop{ compositor.as<abi::ICompositorDesktopInterop>() };
         winrt::WUICD::DesktopWindowTarget target{ nullptr };
         winrt::check_hresult(interop->CreateDesktopWindowTarget(
             window,
