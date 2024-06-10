@@ -116,7 +116,7 @@ namespace LaunchTree::View
             visuals.InsertAtTop(br);
 
             // Try to do some gaussian blur
-            winrt::MGCE::GaussianBlurEffect blurEffect{};
+            /*winrt::MGCE::GaussianBlurEffect blurEffect{};
             blurEffect.Name(L"Blur");
             blurEffect.BlurAmount(5.0f);
             blurEffect.BorderMode(winrt::MGCE::EffectBorderMode::Hard);
@@ -127,14 +127,31 @@ namespace LaunchTree::View
             };
             winrt::WUIC::CompositionEffectBrush blurBrush{
                 blurEffectFactory.CreateBrush()
+            };*/
+
+            // Or a blending effect
+            winrt::Windows::UI::Color bgColor{ 255, 128, 128, 128 };
+            winrt::MGCE::ColorSourceEffect bgColorEffect{};
+            bgColorEffect.Color(bgColor);
+
+            winrt::MGCE::BlendEffect blendEffect{};
+            blendEffect.Name(L"Blend");
+            blendEffect.Mode(winrt::MGCE::BlendEffectMode::ColorBurn);
+            blendEffect.Background(winrt::WUIC::CompositionEffectSourceParameter{ L"source" });
+            blendEffect.Foreground(bgColorEffect);
+            winrt::WUIC::CompositionEffectFactory blendEffectFactory{
+                m_compositor.CreateEffectFactory(blendEffect)
+            };
+            winrt::WUIC::CompositionEffectBrush blendBrush{
+                blendEffectFactory.CreateBrush()
             };
 
             auto backdropBrush{ m_compositor.CreateBackdropBrush() };
-            blurBrush.SetSourceParameter(L"source", backdropBrush);
+            blendBrush.SetSourceParameter(L"source", backdropBrush);
 
             auto blurVisual{ m_compositor.CreateSpriteVisual() };
-            blurVisual.Brush(blurBrush);
-            blurVisual.Size({ 500, 500 });
+            blurVisual.Brush(blendBrush);
+            blurVisual.RelativeSizeAdjustment({ 1, 1 });
             blurVisual.AnchorPoint({ 0.5, 0.5 });
             blurVisual.RelativeOffsetAdjustment({ 0.5, 0.5, 0 });
             visuals.InsertAtTop(blurVisual);

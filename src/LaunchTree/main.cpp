@@ -236,8 +236,6 @@ void InitializeWindow(HINSTANCE hInstance)
     SetWindowStyles(g_hWnd);
     AdjustWindowSize(g_hWnd);
     ShowWindow(g_hWnd, SW_SHOW);
-    SetWindowStyles(g_hWnd);
-    AdjustWindowSize(g_hWnd);
 
     g_compositionHost = std::make_unique<LaunchTree::View::CompositionHost>(g_hWnd);
 }
@@ -305,7 +303,18 @@ LRESULT CALLBACK WndProc(
         PostQuitMessage(0);
         return 0;
     case WM_ACTIVATE:
-        if (wParam == WA_INACTIVE)
+        if ((LOWORD(wParam) == WA_INACTIVE) &&
+            (reinterpret_cast<HWND>(lParam) != g_hWnd))
+        {
+            ::OutputDebugStringW(L"Activation lost.");
+            if (g_hWnd && IsWindowVisible(g_hWnd))
+            {
+                ShowWindow(g_hWnd, SW_HIDE);
+            }
+        }
+        return 0;
+    case WM_KILLFOCUS:
+        if (reinterpret_cast<HWND>(wParam) != g_hWnd)
         {
             ::OutputDebugStringW(L"Focus lost.");
             if (g_hWnd && IsWindowVisible(g_hWnd))
@@ -313,7 +322,7 @@ LRESULT CALLBACK WndProc(
                 ShowWindow(g_hWnd, SW_HIDE);
             }
         }
-        __fallthrough;
+        return 0;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
