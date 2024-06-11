@@ -15,6 +15,10 @@ namespace LaunchTree::View
     public:
         CompositionHost(HWND hWnd);
 
+        winrt::Windows::UI::Composition::ContainerVisual CreateRootVisual();
+        void PresentRootVisual(
+            winrt::Windows::UI::Composition::ContainerVisual rootVisual);
+
     private:
         const winrt::Windows::System::DispatcherQueueController
             m_dispatcherQueueController{ nullptr };

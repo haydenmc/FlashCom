@@ -3,7 +3,14 @@
 
 namespace LaunchTree::View
 {
-    Ui::Ui(CompositionHost* compositionHost) : 
+    Ui::Ui(CompositionHost* const compositionHost,
+        Models::DataModel const * const dataModel) :
+        m_dataModel{ dataModel },
         m_compositionHost{ compositionHost }
     { }
+
+    void Ui::CreateView()
+    {
+
+    }
 }
