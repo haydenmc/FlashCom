@@ -104,6 +104,8 @@
     <None Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="HostWindow.cpp" />
     <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp" />
     <ClCompile Include="Models\DataModel.cpp" />
     <ClCompile Include="Models\TreeNode.cpp" />
@@ -114,6 +116,8 @@
     <ClCompile Include="View\Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="HostWindow.h" />
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h" />
     <ClInclude Include="Models\DataModel.h" />
     <ClInclude Include="Models\TreeNode.h" />
