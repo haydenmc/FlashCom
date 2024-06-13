@@ -68,9 +68,11 @@ namespace
 namespace LaunchTree::View
 {
 #pragma region Public
-    HostWindow::HostWindow(const HINSTANCE& hInstance, std::wstring_view name) :
+    HostWindow::HostWindow(const HINSTANCE& hInstance, std::wstring_view name,
+        std::function<void()> onFocusLostCallback) :
         m_name{ name },
         m_hInstance{ hInstance },
+        m_onFocusLostCallback{ onFocusLostCallback },
         m_windowClass{ CreateWindowClass(
             (std::wstring{ name } + L"WindowClass"),
             &HostWindow::GlobalWndProc,
@@ -116,6 +118,10 @@ namespace LaunchTree::View
             if ((LOWORD(wParam) == WA_INACTIVE) &&
                 (reinterpret_cast<HWND>(lParam) != m_hwnd))
             {
+                if (m_onFocusLostCallback)
+                {
+                    m_onFocusLostCallback();
+                }
                 ::OutputDebugStringW(L"Activation lost.");
             }
             return 0;
@@ -135,9 +141,16 @@ namespace LaunchTree::View
         return m_hwnd;
     }
 
-    void HostWindow::MoveToCursorMonitor()
+    void HostWindow::ShowAndForceToForeground()
     {
-        // Move the window to the active monitor
+        ::OutputDebugStringW(L"HostWindow::ShowAndForceToForeground\n");
+
+        // Workaround to make sure Windows lets us bring our hwnd to the top
+        DWORD windowThreadProcessId = GetWindowThreadProcessId(
+            GetForegroundWindow(), LPDWORD(0));
+        DWORD currentThreadId = GetCurrentThreadId();
+        AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+
         // First, get the cursor so we can find which monitor is "active"
         CURSORINFO cursorInfo
         {
@@ -161,23 +174,19 @@ namespace LaunchTree::View
             monitorInfo.rcMonitor.top,
             monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
             monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
-            (SWP_NOACTIVATE | SWP_NOZORDER)
+            SWP_SHOWWINDOW
         ));
-    }
 
-    void HostWindow::ShowAndForceToForeground()
-    {
-        DWORD windowThreadProcessId = GetWindowThreadProcessId(
-            GetForegroundWindow(), LPDWORD(0));
-        DWORD currentThreadId = GetCurrentThreadId();
-        AttachThreadInput(windowThreadProcessId, currentThreadId, true);
-        BringWindowToTop(m_hwnd);
-        ShowWindow(m_hwnd, SW_SHOW);
+        // Set keyboard focus
+        SetFocus(m_hwnd);
+
+        // /Workaround
         AttachThreadInput(windowThreadProcessId, currentThreadId, false);
     }
 
     void HostWindow::Hide()
     {
+        ::OutputDebugStringW(L"HostWindow::Hide\n");
         winrt::check_bool(ShowWindow(m_hwnd, SW_HIDE));
     }
 #pragma endregion Public

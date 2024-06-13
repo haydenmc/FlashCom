@@ -17,11 +17,13 @@ namespace LaunchTree
         void ToggleVisibility();
 
     private:
-        App(const HINSTANCE& hInstance);
         std::unique_ptr<Models::DataModel> const m_dataModel;
         View::HostWindow m_hostWindow;
         View::Ui m_ui;
         std::unordered_set<uint32_t> m_hotkeysPressed;
         bool m_isShowing{ false };
+
+        App(const HINSTANCE& hInstance);
+        void HandleFocusLost();
     };
 }

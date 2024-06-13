@@ -103,23 +103,35 @@ namespace LaunchTree
 
     void App::ToggleVisibility()
     {
+        ::OutputDebugStringW(L"App::ToggleVisibility\n");
         if (m_isShowing)
         {
-            m_ui.Hide();
             m_isShowing = false;
+            m_ui.Hide();
         }
         else
         {
             // TODO: Reset datamodel state
+            m_isShowing = true;
             m_ui.Update();
             m_ui.Show();
-            m_isShowing = true;
         }
     }
 #pragma endregion Public
 #pragma region Private
-    App::App(const HINSTANCE& hInstance) : m_dataModel{ std::move(CreateDataModel()) },
-        m_hostWindow{ hInstance, L"LaunchTree" }, m_ui{ m_hostWindow, m_dataModel.get() }
+    App::App(const HINSTANCE& hInstance) :
+        m_dataModel{ std::move(CreateDataModel()) },
+        m_hostWindow{ hInstance, L"LaunchTree", std::bind(&App::HandleFocusLost, this) },
+        m_ui{m_hostWindow, m_dataModel.get()}
     { }
+
+    void App::HandleFocusLost()
+    {
+        if (m_isShowing)
+        {
+            m_isShowing = false;
+            m_ui.Hide();
+        }
+    }
 #pragma endregion Private
 }

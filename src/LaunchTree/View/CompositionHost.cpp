@@ -71,6 +71,7 @@ namespace LaunchTree::View
         m_compositor{ winrt::WUIC::Compositor{} },
         m_target{ CreateDesktopWindowTarget(m_hostWindow.GetHWnd(), m_compositor)},
         m_canvasDevice{ winrt::MGC::CanvasDevice::GetSharedDevice() },
+        // TODO: Handle RenderingDeviceReplaced
         m_graphicsDevice{
             winrt::MGCUC::CanvasComposition::CreateCompositionGraphicsDevice(
                     m_compositor,

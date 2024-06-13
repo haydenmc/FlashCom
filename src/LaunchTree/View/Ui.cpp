@@ -13,7 +13,6 @@ namespace LaunchTree::View
 
     void Ui::Show()
     {
-        m_hostWindow.MoveToCursorMonitor();
         m_hostWindow.ShowAndForceToForeground();
     }
 
