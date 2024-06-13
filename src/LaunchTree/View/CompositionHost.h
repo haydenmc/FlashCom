@@ -1,4 +1,5 @@
 #pragma once
+#include "HostWindow.h"
 #include "ICompositionVisual.h"
 
 #include <vector>
@@ -13,13 +14,14 @@ namespace LaunchTree::View
     class CompositionHost
     {
     public:
-        CompositionHost(HWND hWnd);
+        CompositionHost(HostWindow const & hostWindow);
 
         winrt::Windows::UI::Composition::ContainerVisual CreateRootVisual();
         void PresentRootVisual(
             winrt::Windows::UI::Composition::ContainerVisual rootVisual);
 
     private:
+        HostWindow const & m_hostWindow;
         const winrt::Windows::System::DispatcherQueueController
             m_dispatcherQueueController{ nullptr };
         const winrt::Windows::UI::Composition::Compositor m_compositor{ nullptr };

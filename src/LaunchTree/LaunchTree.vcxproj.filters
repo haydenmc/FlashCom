@@ -60,7 +60,7 @@
     <ClCompile Include="App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HostWindow.cpp">
+    <ClCompile Include="View\HostWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,7 +95,7 @@
     <ClInclude Include="App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HostWindow.h">
+    <ClInclude Include="View\HostWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

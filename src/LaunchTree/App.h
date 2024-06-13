@@ -1,20 +1,27 @@
 #pragma once
+#include "Models/DataModel.h"
+#include "View/HostWindow.h"
+#include "View/Ui.h"
+
 #include <cstdint>
 #include <memory>
-#include "Models/DataModel.h"
+#include <unordered_set>
 
 namespace LaunchTree
 {
     struct App
     {
-        App() = delete;
-        static std::unique_ptr<App> CreateApp();
-        void Show();
-        void Hide();
-        void KeyboardKeyDown(uint8_t vkey);
+        static std::unique_ptr<App> CreateApp(const HINSTANCE& hInstance);
+        int RunMessageLoop();
+        void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb);
+        void ToggleVisibility();
 
     private:
-        App(std::unique_ptr<Models::DataModel>&& dataModel);
+        App(const HINSTANCE& hInstance);
         std::unique_ptr<Models::DataModel> const m_dataModel;
+        View::HostWindow m_hostWindow;
+        View::Ui m_ui;
+        std::unordered_set<uint32_t> m_hotkeysPressed;
+        bool m_isShowing{ false };
     };
 }

@@ -7,13 +7,15 @@ namespace LaunchTree::View
     class Ui
     {
     public:
-        Ui(CompositionHost* const compositionHost,
+        Ui(HostWindow& hostWindow,
             Models::DataModel const * const dataModel);
-
-        void CreateView();
+        void Show();
+        void Hide();
+        void Update();
 
     private:
+        HostWindow& m_hostWindow;
         Models::DataModel const * const m_dataModel;
-        CompositionHost* const m_compositionHost;
+        CompositionHost m_compositionHost;
     };
 }

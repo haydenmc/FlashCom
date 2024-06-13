@@ -65,10 +65,11 @@ namespace
 namespace LaunchTree::View
 {
 #pragma region Public
-    CompositionHost::CompositionHost(HWND hWnd) :
+    CompositionHost::CompositionHost(HostWindow const& hostWindow) :
+        m_hostWindow{ hostWindow },
         m_dispatcherQueueController{ CreateDispatcherQueue() },
         m_compositor{ winrt::WUIC::Compositor{} },
-        m_target{ CreateDesktopWindowTarget(hWnd, m_compositor) },
+        m_target{ CreateDesktopWindowTarget(m_hostWindow.GetHWnd(), m_compositor)},
         m_canvasDevice{ winrt::MGC::CanvasDevice::GetSharedDevice() },
         m_graphicsDevice{
             winrt::MGCUC::CanvasComposition::CreateCompositionGraphicsDevice(
