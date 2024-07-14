@@ -113,7 +113,6 @@ namespace LaunchTree
         {
             // TODO: Reset datamodel state
             m_isShowing = true;
-            m_ui.Update();
             m_ui.Show();
         }
     }

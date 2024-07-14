@@ -32,7 +32,7 @@ namespace LaunchTree::Models
         std::transform(
             m_children.begin(),
             m_children.end(),
-            returnValue.begin(),
+            std::back_inserter(returnValue),
             [](const std::unique_ptr<TreeNode>& in)
             {
                 return in.get();

@@ -4,6 +4,7 @@
 namespace LaunchTree::Models
 {
     DataModel::DataModel(std::unique_ptr<TreeNode>&& rootNode) :
-        RootNode{ std::move(rootNode) }
+        RootNode{ std::move(rootNode) },
+        CurrentNode{ RootNode.get() }
     { }
 }

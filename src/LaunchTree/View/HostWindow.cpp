@@ -68,126 +68,140 @@ namespace
 namespace LaunchTree::View
 {
 #pragma region Public
-    HostWindow::HostWindow(const HINSTANCE& hInstance, std::wstring_view name,
-        std::function<void()> onFocusLostCallback) :
-        m_name{ name },
-        m_hInstance{ hInstance },
-        m_onFocusLostCallback{ onFocusLostCallback },
-        m_windowClass{ CreateWindowClass(
-            (std::wstring{ name } + L"WindowClass"),
-            &HostWindow::GlobalWndProc,
-            hInstance) },
-        m_hwnd{ CreateWindowInstance(
-            this,
-            (std::wstring{ name } + L"WindowClass"),
-            std::wstring{ name }, hInstance) }
-    { }
+HostWindow::HostWindow(const HINSTANCE& hInstance, std::wstring_view name,
+    std::function<void()> onFocusLostCallback) :
+    m_name{ name },
+    m_hInstance{ hInstance },
+    m_onFocusLostCallback{ onFocusLostCallback },
+    m_windowClass{ CreateWindowClass(
+        (std::wstring{ name } + L"WindowClass"),
+        &HostWindow::GlobalWndProc,
+        hInstance) },
+    m_hwnd{ CreateWindowInstance(
+        this,
+        (std::wstring{ name } + L"WindowClass"),
+        std::wstring{ name }, hInstance) }
+{ }
 
-    HostWindow::~HostWindow()
+HostWindow::~HostWindow()
+{
+    DestroyWindow(m_hwnd);
+    UnregisterClassW((std::wstring{ m_name } + L"WindowClass").data(), m_hInstance);
+}
+
+LRESULT HostWindow::GlobalWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    // Retrieve instance pointer
+    HostWindow* pWnd = reinterpret_cast<HostWindow*>(GetWindowLongPtrW(hWnd, 0));
+    if (pWnd != nullptr)
     {
-        DestroyWindow(m_hwnd);
-        UnregisterClassW((std::wstring{ m_name } + L"WindowClass").data(), m_hInstance);
+        return pWnd->InstanceWndProc(hWnd, message, wParam, lParam);
     }
 
-    LRESULT HostWindow::GlobalWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-    {
-        // Retrieve instance pointer
-        HostWindow* pWnd = reinterpret_cast<HostWindow*>(GetWindowLongPtrW(hWnd, 0));
-        if (pWnd != nullptr)
-        {
-            return pWnd->InstanceWndProc(hWnd, message, wParam, lParam);
-        }
-        
-        // TODO: Log error
-        return DefWindowProcW(hWnd, message, wParam, lParam);
-    }
+    // TODO: Log error
+    return DefWindowProcW(hWnd, message, wParam, lParam);
+}
 
-    LRESULT HostWindow::InstanceWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT HostWindow::InstanceWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
     {
-        switch (message)
+    case WM_KEYDOWN:
+        __fallthrough;
+    case WM_KEYUP:
+        // TODO
+        return 0;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+    case WM_ACTIVATE:
+        if ((LOWORD(wParam) == WA_INACTIVE) &&
+            (reinterpret_cast<HWND>(lParam) != m_hwnd))
         {
-        case WM_KEYDOWN:
-            __fallthrough;
-        case WM_KEYUP:
-            // TODO
-            return 0;
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            return 0;
-        case WM_ACTIVATE:
-            if ((LOWORD(wParam) == WA_INACTIVE) &&
-                (reinterpret_cast<HWND>(lParam) != m_hwnd))
+            if (m_onFocusLostCallback)
             {
-                if (m_onFocusLostCallback)
-                {
-                    m_onFocusLostCallback();
-                }
-                ::OutputDebugStringW(L"Activation lost.");
+                m_onFocusLostCallback();
             }
-            return 0;
-        case WM_KILLFOCUS:
-            if (reinterpret_cast<HWND>(wParam) != m_hwnd)
-            {
-                ::OutputDebugStringW(L"Focus lost.");
-            }
-            return 0;
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
+            ::OutputDebugStringW(L"Activation lost.");
         }
-    }
-
-    HWND const HostWindow::GetHWnd() const
-    {
-        return m_hwnd;
-    }
-
-    void HostWindow::ShowAndForceToForeground()
-    {
-        ::OutputDebugStringW(L"HostWindow::ShowAndForceToForeground\n");
-
-        // Workaround to make sure Windows lets us bring our hwnd to the top
-        DWORD windowThreadProcessId = GetWindowThreadProcessId(
-            GetForegroundWindow(), LPDWORD(0));
-        DWORD currentThreadId = GetCurrentThreadId();
-        AttachThreadInput(windowThreadProcessId, currentThreadId, true);
-
-        // First, get the cursor so we can find which monitor is "active"
-        CURSORINFO cursorInfo
+        return 0;
+    case WM_KILLFOCUS:
+        if (reinterpret_cast<HWND>(wParam) != m_hwnd)
         {
-            .cbSize = sizeof(CURSORINFO)
-        };
-        winrt::check_bool(GetCursorInfo(&cursorInfo));
-
-        // Retrieve the monitor at the current cursor coordinates
-        HMONITOR monitor{ MonitorFromPoint(cursorInfo.ptScreenPos, MONITOR_DEFAULTTONEAREST) };
-        MONITORINFO monitorInfo
-        {
-            .cbSize = sizeof(MONITORINFO)
-        };
-        winrt::check_bool(GetMonitorInfoW(monitor, &monitorInfo));
-
-        // Set window to size of monitor, always on top
-        winrt::check_bool(SetWindowPos(
-            m_hwnd,
-            HWND_TOPMOST,
-            monitorInfo.rcMonitor.left,
-            monitorInfo.rcMonitor.top,
-            monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
-            monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
-            SWP_SHOWWINDOW
-        ));
-
-        // Set keyboard focus
-        SetFocus(m_hwnd);
-
-        // /Workaround
-        AttachThreadInput(windowThreadProcessId, currentThreadId, false);
+            ::OutputDebugStringW(L"Focus lost.");
+        }
+        return 0;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
+}
 
-    void HostWindow::Hide()
+HWND const HostWindow::GetHWnd() const
+{
+    return m_hwnd;
+}
+
+HostWindow::WindowShowTicket HostWindow::PrepareToShow()
+{
+    ::OutputDebugStringW(L"HostWindow::PrepareToShow\n");
+    // First, get the cursor so we can find which monitor is "active"
+    CURSORINFO cursorInfo
     {
-        ::OutputDebugStringW(L"HostWindow::Hide\n");
-        winrt::check_bool(ShowWindow(m_hwnd, SW_HIDE));
-    }
+        .cbSize = sizeof(CURSORINFO)
+    };
+    winrt::check_bool(GetCursorInfo(&cursorInfo));
+
+    // Retrieve the monitor at the current cursor coordinates
+    HMONITOR monitor{ MonitorFromPoint(cursorInfo.ptScreenPos, MONITOR_DEFAULTTONEAREST) };
+    MONITORINFO monitorInfo
+    {
+        .cbSize = sizeof(MONITORINFO)
+    };
+    winrt::check_bool(GetMonitorInfoW(monitor, &monitorInfo));
+
+    // Return a ticket that the caller can use to actually show the window
+    HWND showHwnd{ m_hwnd };
+    std::function<void()> showFunction{
+        [showHwnd, monitorInfo]() -> void
+        {
+            // Workaround to make sure Windows lets us bring our hwnd to the top
+            DWORD windowThreadProcessId = GetWindowThreadProcessId(
+                GetForegroundWindow(), LPDWORD(0));
+            DWORD currentThreadId = GetCurrentThreadId();
+            AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+
+            // Set window to size of monitor, always on top
+            winrt::check_bool(SetWindowPos(
+                showHwnd,
+                HWND_TOPMOST,
+                monitorInfo.rcMonitor.left,
+                monitorInfo.rcMonitor.top,
+                monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+                monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+                SWP_SHOWWINDOW
+            ));
+
+            // Set keyboard focus
+            SetFocus(showHwnd);
+
+            // /Workaround
+            AttachThreadInput(windowThreadProcessId, currentThreadId, false);
+        }
+    };
+
+    return HostWindow::WindowShowTicket{
+        .WindowSize = {
+            (monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left),
+            (monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top)
+        },
+        .ShowWindow = showFunction
+    };
+}
+
+void HostWindow::Hide()
+{
+    ::OutputDebugStringW(L"HostWindow::Hide\n");
+    winrt::check_bool(ShowWindow(m_hwnd, SW_HIDE));
+}
 #pragma endregion Public
 }

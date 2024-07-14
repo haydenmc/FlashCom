@@ -3,11 +3,6 @@
 #include "ICompositionVisual.h"
 
 #include <vector>
-#include <windef.h>
-#include <winrt/Microsoft.Graphics.Canvas.h>
-#include <winrt/Windows.System.h>
-#include <winrt/Windows.UI.Composition.h>
-#include <winrt/Windows.UI.Composition.Desktop.h>
 
 namespace LaunchTree::View
 {
@@ -19,6 +14,12 @@ namespace LaunchTree::View
         winrt::Windows::UI::Composition::ContainerVisual CreateRootVisual();
         void PresentRootVisual(
             winrt::Windows::UI::Composition::ContainerVisual rootVisual);
+
+        template<class C, class... Args>
+        std::unique_ptr<C> CreateVisual(Args... args)
+        {
+            return std::make_unique<C>(m_compositor, m_canvasDevice, m_graphicsDevice, args...);
+        }
 
     private:
         HostWindow const & m_hostWindow;
