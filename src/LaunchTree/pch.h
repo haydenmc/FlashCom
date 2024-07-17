@@ -12,11 +12,15 @@
 #include <winrt/Microsoft.Graphics.Canvas.Text.h>
 #include <winrt/Microsoft.Graphics.Canvas.UI.Composition.h>
 #include <winrt/Windows.Graphics.Effects.h>
+#include <winrt/Windows.Storage.h>
 #include <winrt/Windows.System.h>
 #include <winrt/Windows.UI.Composition.h>
 #include <winrt/Windows.UI.Composition.Desktop.h>
 #include <windows.ui.composition.interop.h>
 #include <winrt/Windows.UI.Text.h>
+
+// JSON
+#include <json.hpp>
 
 // Namespace aliases
 namespace winrt

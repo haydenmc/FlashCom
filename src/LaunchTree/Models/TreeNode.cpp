@@ -15,17 +15,17 @@ namespace LaunchTree::Models
         m_children{ std::move(children) }
     { }
 
-    uint32_t TreeNode::GetVkCode()
+    uint32_t TreeNode::GetVkCode() const
     {
         return m_vkCode;
     }
 
-    std::wstring TreeNode::GetName()
+    std::wstring TreeNode::GetName() const
     {
         return m_name;
     }
 
-    const std::vector<TreeNode*> TreeNode::GetChildren()
+    const std::vector<TreeNode*> TreeNode::GetChildren() const
     {
         std::vector<TreeNode*> returnValue;
         returnValue.reserve(m_children.size());
@@ -41,7 +41,7 @@ namespace LaunchTree::Models
         return returnValue;
     }
 
-    void TreeNode::Execute()
+    void TreeNode::Execute() const
     {
         // TODO
     }

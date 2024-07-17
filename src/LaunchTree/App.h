@@ -1,5 +1,6 @@
 #pragma once
 #include "Models/DataModel.h"
+#include "Settings/SettingsManager.h"
 #include "View/HostWindow.h"
 #include "View/Ui.h"
 
@@ -17,6 +18,7 @@ namespace LaunchTree
         void ToggleVisibility();
 
     private:
+        Settings::SettingsManager m_settingsManager;
         std::unique_ptr<Models::DataModel> const m_dataModel;
         View::HostWindow m_hostWindow;
         View::Ui m_ui;
@@ -25,5 +27,7 @@ namespace LaunchTree
 
         App(const HINSTANCE& hInstance);
         void HandleFocusLost();
+        void OnKeyDown(uint8_t vkeyCode);
+        void OnKeyUp(uint8_t vkeyCode);
     };
 }

@@ -1,10 +1,15 @@
 #pragma once
+#include <filesystem>
+#include "../Models/TreeNode.h"
 
 namespace LaunchTree::Settings
 {
-    class SettingsManager
+    struct SettingsManager
     {
-    public:
         SettingsManager();
+        std::unique_ptr<Models::TreeNode> GetTree();
+
+    private:
+        std::filesystem::path const m_settingsFilePath;
     };
 }

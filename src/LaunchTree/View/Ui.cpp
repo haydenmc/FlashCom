@@ -62,7 +62,7 @@ namespace LaunchTree::View
 
         // Layout
         float xOffset{ (m_uiBounds.first / 2.0f) -
-            (maxKeyWidth + maxNameWidth + c_bufferBetweenKeyAndName) };
+            ( (maxKeyWidth + maxNameWidth + c_bufferBetweenKeyAndName) / 2.0f ) };
         float yOffset{ (m_uiBounds.second / 2.0f) -
             ( ( (maxHeight * nodeVisuals.size()) +
                 (c_bufferBetweenNodes * min((nodeVisuals.size() - 1), 0) ) ) / 2.0f ) };

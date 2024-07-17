@@ -78,7 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LaunchTree\LaunchTree.vcxproj">
-      <Private>True</Private>
+      <!--<Private>True</Private>-->
       <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
         <IncludeAssets>fmtd.dll</IncludeAssets>
       <PrivateAssets>fmtd.dll</PrivateAssets>

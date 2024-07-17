@@ -12,11 +12,22 @@ namespace
     std::unique_ptr<LaunchTree::Models::DataModel> CreateDataModel()
     {
         std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>> rootChildren;
+        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>> commsChildren;
+        commsChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
+            'W',
+            L"WarmItUp",
+            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
+        ));
+        commsChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
+            'V',
+            L"Mumble",
+            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
+        ));
         rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
             'C',
             L"Comms",
-            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
-        ));
+            std::move(commsChildren)));
+
         rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
             'D',
             L"Dev",
@@ -54,8 +65,18 @@ namespace LaunchTree
         MSG msg;
         while (GetMessage(&msg, nullptr, 0, 0))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            switch (msg.message)
+            {
+            case WM_KEYDOWN:
+                OnKeyDown(static_cast<uint8_t>(msg.wParam));
+                break;
+            case WM_KEYUP:
+                OnKeyUp(static_cast<uint8_t>(msg.wParam));
+                break;
+            default:
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
         }
 
         return (int)msg.wParam;
@@ -108,10 +129,11 @@ namespace LaunchTree
         {
             m_isShowing = false;
             m_ui.Hide();
+            m_dataModel->CurrentNode = m_dataModel->RootNode.get();
+            m_ui.Update();
         }
         else
         {
-            // TODO: Reset datamodel state
             m_isShowing = true;
             m_ui.Show();
         }
@@ -131,6 +153,24 @@ namespace LaunchTree
             m_isShowing = false;
             m_ui.Hide();
         }
+    }
+
+    void App::OnKeyDown(uint8_t vkeyCode)
+    {
+        for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
+        {
+            if ((childNode->GetVkCode() == vkeyCode) &&
+                (childNode->GetChildren().size() > 0))
+            {
+                m_dataModel->CurrentNode = childNode;
+                m_ui.Update();
+            }
+        }
+    }
+
+    void App::OnKeyUp(uint8_t /*vkeyCode*/)
+    {
+
     }
 #pragma endregion Private
 }
