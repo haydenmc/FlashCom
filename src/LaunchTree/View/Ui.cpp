@@ -65,7 +65,7 @@ namespace LaunchTree::View
             ( (maxKeyWidth + maxNameWidth + c_bufferBetweenKeyAndName) / 2.0f ) };
         float yOffset{ (m_uiBounds.second / 2.0f) -
             ( ( (maxHeight * nodeVisuals.size()) +
-                (c_bufferBetweenNodes * min((nodeVisuals.size() - 1), 0) ) ) / 2.0f ) };
+                (c_bufferBetweenNodes * max((nodeVisuals.size() - 1), 0) ) ) / 2.0f ) };
         for (size_t i{ 0 }; i < nodeVisuals.size(); ++i)
         {
             auto& keyVisual{ nodeVisuals.at(i).first };
