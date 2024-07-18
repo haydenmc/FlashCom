@@ -23,13 +23,13 @@ namespace
         winrt::MGC::CanvasDevice canvasDevice,
         winrt::WUIC::CompositionGraphicsDevice graphicsDevice,
         winrt::MGCT::CanvasTextFormat textFormat,
-        std::wstring_view content
+        std::string_view content
     )
     {
         // Compute bounds of text
         winrt::MGCT::CanvasTextLayout textLayout{
             canvasDevice,
-            content,
+            winrt::to_hstring(content),
             textFormat,
             0,
             0
@@ -71,7 +71,7 @@ namespace LaunchTree::View
         winrt::MGC::CanvasDevice canvasDevice,
         winrt::WUIC::CompositionGraphicsDevice graphicsDevice,
         winrt::MGCT::CanvasTextFormat textFormat,
-        std::wstring_view content
+        std::string_view content
     ) :
         m_visual{
             CreateTextVisual(

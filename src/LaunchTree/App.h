@@ -29,5 +29,7 @@ namespace LaunchTree
         void HandleFocusLost();
         void OnKeyDown(uint8_t vkeyCode);
         void OnKeyUp(uint8_t vkeyCode);
+        void Show();
+        void Hide();
     };
 }

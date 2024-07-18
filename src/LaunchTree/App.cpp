@@ -9,43 +9,11 @@ namespace
 {
     const std::unordered_set<uint32_t> c_hotkeyCombo{ VK_LWIN, VK_SPACE };
 
-    std::unique_ptr<LaunchTree::Models::DataModel> CreateDataModel()
+    std::unique_ptr<LaunchTree::Models::DataModel> CreateDataModel(
+        LaunchTree::Settings::SettingsManager& settingsManager)
     {
-        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>> rootChildren;
-        std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>> commsChildren;
-        commsChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
-            'W',
-            L"WarmItUp",
-            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
-        ));
-        commsChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
-            'V',
-            L"Mumble",
-            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
-        ));
-        rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
-            'C',
-            L"Comms",
-            std::move(commsChildren)));
 
-        rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
-            'D',
-            L"Dev",
-            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
-        ));
-        rootChildren.push_back(std::make_unique<LaunchTree::Models::TreeNode>(
-            'G',
-            L"Gaming",
-            std::vector<std::unique_ptr<LaunchTree::Models::TreeNode>>{}
-        ));
-
-        auto rootNode{
-            std::make_unique<LaunchTree::Models::TreeNode>(
-                '\0',
-                L"",
-                std::move(rootChildren)
-            )
-        };
+        auto rootNode{ settingsManager.GetTree() };
 
         return std::make_unique<LaunchTree::Models::DataModel>(
             std::move(rootNode));
@@ -127,21 +95,17 @@ namespace LaunchTree
         ::OutputDebugStringW(L"App::ToggleVisibility\n");
         if (m_isShowing)
         {
-            m_isShowing = false;
-            m_ui.Hide();
-            m_dataModel->CurrentNode = m_dataModel->RootNode.get();
-            m_ui.Update();
+            Hide();
         }
         else
         {
-            m_isShowing = true;
-            m_ui.Show();
+            Show();
         }
     }
 #pragma endregion Public
 #pragma region Private
     App::App(const HINSTANCE& hInstance) :
-        m_dataModel{ std::move(CreateDataModel()) },
+        m_dataModel{ std::move(CreateDataModel(m_settingsManager)) },
         m_hostWindow{ hInstance, L"LaunchTree", std::bind(&App::HandleFocusLost, this) },
         m_ui{m_hostWindow, m_dataModel.get()}
     { }
@@ -150,8 +114,7 @@ namespace LaunchTree
     {
         if (m_isShowing)
         {
-            m_isShowing = false;
-            m_ui.Hide();
+            Hide();
         }
     }
 
@@ -159,11 +122,18 @@ namespace LaunchTree
     {
         for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
         {
-            if ((childNode->GetVkCode() == vkeyCode) &&
-                (childNode->GetChildren().size() > 0))
+            if (childNode->GetVkCode() == vkeyCode)
             {
-                m_dataModel->CurrentNode = childNode;
-                m_ui.Update();
+                if (childNode->GetChildren().size() > 0)
+                {
+                    m_dataModel->CurrentNode = childNode;
+                    m_ui.Update();
+                }
+                else
+                {
+                    childNode->Execute();
+                    Hide();
+                }
             }
         }
     }
@@ -171,6 +141,20 @@ namespace LaunchTree
     void App::OnKeyUp(uint8_t /*vkeyCode*/)
     {
 
+    }
+
+    void App::Show()
+    {
+        m_isShowing = true;
+        m_ui.Show();
+    }
+
+    void App::Hide()
+    {
+        m_isShowing = false;
+        m_ui.Hide();
+        m_dataModel->CurrentNode = m_dataModel->RootNode.get();
+        m_ui.Update();
     }
 #pragma endregion Private
 }

@@ -10,17 +10,17 @@ namespace LaunchTree::Models
     public:
         TreeNode(
             uint32_t vkCode,
-            std::wstring_view name,
+            std::string_view name,
             std::vector<std::unique_ptr<TreeNode>>&& children
         );
         uint32_t GetVkCode() const;
-        std::wstring GetName() const;
+        std::string GetName() const;
         const std::vector<TreeNode*> GetChildren() const;
-        void Execute() const;
+        virtual void Execute() const;
 
     private:
         const uint32_t m_vkCode;
-        const std::wstring m_name;
+        const std::string m_name;
         const std::vector<std::unique_ptr<TreeNode>> m_children;
     };
 }

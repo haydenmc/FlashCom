@@ -7,7 +7,7 @@ namespace LaunchTree::Models
 {
     TreeNode::TreeNode(
         uint32_t vkCode,
-        std::wstring_view name,
+        std::string_view name,
         std::vector<std::unique_ptr<TreeNode>>&& children
     ) :
         m_vkCode{ vkCode },
@@ -20,7 +20,7 @@ namespace LaunchTree::Models
         return m_vkCode;
     }
 
-    std::wstring TreeNode::GetName() const
+    std::string TreeNode::GetName() const
     {
         return m_name;
     }

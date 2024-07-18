@@ -16,7 +16,7 @@ namespace LaunchTree::View
             winrt::Microsoft::Graphics::Canvas::CanvasDevice canvasDevice,
             winrt::Windows::UI::Composition::CompositionGraphicsDevice graphicsDevice,
             winrt::Microsoft::Graphics::Canvas::Text::CanvasTextFormat textFormat,
-            std::wstring_view content
+            std::string_view content
         );
 
         // ICompositionVisual

@@ -50,7 +50,7 @@ namespace LaunchTree::View
         for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
         {
             auto keyTextVisual{ m_compositionHost.CreateVisual<TextVisual>(
-                keyTextFormat, std::format(L"{}", static_cast<char>(childNode->GetVkCode())))};
+                keyTextFormat, std::format("{}", static_cast<char>(childNode->GetVkCode())))};
             auto nameTextVisual{ m_compositionHost.CreateVisual<TextVisual>(
                 nameTextFormat, childNode->GetName()) };
             maxKeyWidth = max(keyTextVisual->Visual().Size().x, maxKeyWidth);

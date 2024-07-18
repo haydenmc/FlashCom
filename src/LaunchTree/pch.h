@@ -19,8 +19,13 @@
 #include <windows.ui.composition.interop.h>
 #include <winrt/Windows.UI.Text.h>
 
-// JSON
+// External libraries
+#pragma warning(push, 0)
 #include <json.hpp>
+#define UTF_CPP_CPLUSPLUS _MSVC_LANG // Fix for UTF8 C++ std version
+                                     // https://github.com/nemtrif/utfcpp/issues/85
+#include <utf8.h>
+#pragma warning(pop)
 
 // Namespace aliases
 namespace winrt
