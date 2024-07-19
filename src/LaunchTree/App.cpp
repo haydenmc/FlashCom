@@ -88,13 +88,14 @@ namespace LaunchTree
 
         if (m_hotkeysPressed.size() == c_hotkeyCombo.size())
         {
+            SPDLOG_INFO("App::HandleLowLevelKeyboardInput - Hotkey pressed");
             ToggleVisibility();
         }
     }
 
     void App::ToggleVisibility()
     {
-        ::OutputDebugStringW(L"App::ToggleVisibility\n");
+        SPDLOG_INFO("App::ToggleVisibility");
         if (m_isShowing)
         {
             Hide();
@@ -132,11 +133,13 @@ namespace LaunchTree
             {
                 if (childNode->GetChildren().size() > 0)
                 {
+                    SPDLOG_INFO("App::OnKeyDown - Navigating to {}", childNode->GetName());
                     m_dataModel->CurrentNode = childNode;
                     m_ui.Update();
                 }
                 else
                 {
+                    SPDLOG_INFO("App::OnKeyDown - Executing {}", childNode->GetName());
                     Hide();
                     childNode->Execute();
                 }
@@ -151,12 +154,14 @@ namespace LaunchTree
 
     void App::Show()
     {
+        SPDLOG_INFO("App::Show");
         m_isShowing = true;
         m_ui.Show();
     }
 
     void App::Hide()
     {
+        SPDLOG_INFO("App::Hide");
         m_isShowing = false;
         m_ui.Hide();
         m_dataModel->CurrentNode = m_dataModel->RootNode.get();
@@ -165,7 +170,7 @@ namespace LaunchTree
 
     void App::OnSettingsCommand()
     {
-        OutputDebugStringW(L"Settings invoked");
+        SPDLOG_INFO("App::OnSettingsCommand");
         ShellExecuteW(nullptr, L"explore",
             m_settingsManager.GetSettingsFilePath().parent_path().wstring().data(),
             nullptr, nullptr, SW_SHOWNORMAL);
@@ -173,6 +178,7 @@ namespace LaunchTree
 
     void App::OnExitCommand()
     {
+        SPDLOG_INFO("App::OnExitCommand");
         PostMessageW(nullptr, WM_CLOSE, 0, 0);
     }
 #pragma endregion Private

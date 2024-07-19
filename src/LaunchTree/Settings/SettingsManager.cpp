@@ -56,7 +56,7 @@ namespace
 
     std::filesystem::path GetSettingsFilePath()
     {
-        return std::filesystem::path{ winrt::Windows::Storage::ApplicationData::Current()
+        return std::filesystem::path{ winrt::WStorage::ApplicationData::Current()
             .LocalFolder().Path().c_str() } / c_settingsFileName;
     }
 
@@ -130,6 +130,8 @@ namespace LaunchTree::Settings
     {
         if (!std::filesystem::exists(m_settingsFilePath))
         {
+            SPDLOG_INFO("SettingsManager::SettingsManager - Writing default settings file to {}",
+                m_settingsFilePath.string());
             std::ofstream defaultSettingsFile{ m_settingsFilePath };
             defaultSettingsFile << c_defaultSettingsFileContents;
             defaultSettingsFile.close();

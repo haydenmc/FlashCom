@@ -81,7 +81,9 @@ HostWindow::HostWindow(const HINSTANCE& hInstance, std::wstring_view name,
         this,
         (std::wstring{ name } + L"WindowClass"),
         std::wstring{ name }, hInstance) }
-{ }
+{
+    SPDLOG_INFO("HostWindow::HostWindow - Created");
+}
 
 HostWindow::~HostWindow()
 {
@@ -118,17 +120,17 @@ LRESULT HostWindow::InstanceWndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
         if ((LOWORD(wParam) == WA_INACTIVE) &&
             (reinterpret_cast<HWND>(lParam) != m_hwnd))
         {
+            SPDLOG_INFO("HostWindow::InstanceWndProc - WM_ACTIVATE activation lost.");
             if (m_onFocusLostCallback)
             {
                 m_onFocusLostCallback();
             }
-            ::OutputDebugStringW(L"Activation lost.");
         }
         return 0;
     case WM_KILLFOCUS:
         if (reinterpret_cast<HWND>(wParam) != m_hwnd)
         {
-            ::OutputDebugStringW(L"Focus lost.");
+            SPDLOG_INFO("HostWindow::InstanceWndProc - WM_KILLFOCUS focus lost.");
         }
         return 0;
     default:
@@ -143,7 +145,6 @@ HWND const HostWindow::GetHWnd() const
 
 HostWindow::WindowShowTicket HostWindow::PrepareToShow()
 {
-    ::OutputDebugStringW(L"HostWindow::PrepareToShow\n");
     // First, get the cursor so we can find which monitor is "active"
     CURSORINFO cursorInfo
     {
@@ -159,11 +160,22 @@ HostWindow::WindowShowTicket HostWindow::PrepareToShow()
     };
     winrt::check_bool(GetMonitorInfoW(monitor, &monitorInfo));
 
+    SPDLOG_INFO("HostWindow::PrepareToShow - Preparing to show on monitor ({}, {}) {} x {}",
+        monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top,
+        (monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left),
+        (monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top));
+
     // Return a ticket that the caller can use to actually show the window
     HWND showHwnd{ m_hwnd };
     std::function<void()> showFunction{
         [showHwnd, monitorInfo]() -> void
         {
+            SPDLOG_INFO("HostWindow::PrepareToShow - Ticket called, showing on monitor "
+                "({}, {}) {} x {}",
+                monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top,
+                (monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left),
+                (monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top));
+
             // Workaround to make sure Windows lets us bring our hwnd to the top
             DWORD windowThreadProcessId = GetWindowThreadProcessId(
                 GetForegroundWindow(), LPDWORD(0));
@@ -176,8 +188,8 @@ HostWindow::WindowShowTicket HostWindow::PrepareToShow()
                 HWND_TOPMOST,
                 monitorInfo.rcMonitor.left,
                 monitorInfo.rcMonitor.top,
-                monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
-                monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+                (monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left),
+                (monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top),
                 SWP_SHOWWINDOW
             ));
 
@@ -200,7 +212,7 @@ HostWindow::WindowShowTicket HostWindow::PrepareToShow()
 
 void HostWindow::Hide()
 {
-    ::OutputDebugStringW(L"HostWindow::Hide\n");
+    SPDLOG_INFO("HostWindow::Hide");
     ShowWindow(m_hwnd, SW_HIDE);
 }
 #pragma endregion Public
