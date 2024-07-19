@@ -8,6 +8,37 @@
 namespace
 {
     constexpr std::string_view c_settingsFileName{ "settings.json" };
+    constexpr std::string_view c_defaultSettingsFileContents{ R"({
+    "commandTree": [
+        {
+            "name": "Tools",
+            "key": "T",
+            "children": [
+                {
+                    "name": "Calculator",
+                    "key": "C",
+                    "type": "shellExecute",
+                    "executeFile": "calc.exe",
+                    "executeParameters": ""
+                },
+                {
+                    "name": "Notepad",
+                    "key": "N",
+                    "type": "shellExecute",
+                    "executeFile": "notepad.exe",
+                    "executeParameters": ""
+                }
+            ]
+        },
+        {
+            "name": "Edge",
+            "key": "E",
+            "type": "shellExecute",
+            "executeFile": "msedge.exe",
+            "executeParameters": ""
+        }
+    ]
+})" };
 
     std::filesystem::path GetSettingsFilePath()
     {
@@ -68,8 +99,20 @@ namespace
 
 namespace LaunchTree::Settings
 {
-    SettingsManager::SettingsManager() : m_settingsFilePath{ GetSettingsFilePath() }
-    { }
+    SettingsManager::SettingsManager() : m_settingsFilePath{ ::GetSettingsFilePath() }
+    {
+        if (!std::filesystem::exists(m_settingsFilePath))
+        {
+            std::ofstream defaultSettingsFile{ m_settingsFilePath };
+            defaultSettingsFile << c_defaultSettingsFileContents;
+            defaultSettingsFile.close();
+        }
+    }
+
+    std::filesystem::path SettingsManager::GetSettingsFilePath()
+    {
+        return m_settingsFilePath;
+    }
 
     std::unique_ptr<Models::TreeNode> SettingsManager::GetTree()
     {

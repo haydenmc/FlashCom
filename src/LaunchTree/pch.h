@@ -3,6 +3,7 @@
 // Windows API
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <shellapi.h>
 
 // C++/WinRT
 #include <Unknwn.h>

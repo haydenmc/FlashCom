@@ -1,6 +1,5 @@
 #include <pch.h>
 #include "ShellExecuteTreeNode.h"
-#include <shellapi.h>
 
 namespace LaunchTree::Models
 {

@@ -1,6 +1,5 @@
 #include <pch.h>
 #include "TrayIcon.h"
-#include <shellapi.h>
 
 namespace
 {

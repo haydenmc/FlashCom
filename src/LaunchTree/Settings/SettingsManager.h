@@ -7,6 +7,7 @@ namespace LaunchTree::Settings
     struct SettingsManager
     {
         SettingsManager();
+        std::filesystem::path GetSettingsFilePath();
         std::unique_ptr<Models::TreeNode> GetTree();
 
     private:

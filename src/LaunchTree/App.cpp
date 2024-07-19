@@ -166,6 +166,9 @@ namespace LaunchTree
     void App::OnSettingsCommand()
     {
         OutputDebugStringW(L"Settings invoked");
+        ShellExecuteW(nullptr, L"explore",
+            m_settingsManager.GetSettingsFilePath().parent_path().wstring().data(),
+            nullptr, nullptr, SW_SHOWNORMAL);
     }
 
     void App::OnExitCommand()
