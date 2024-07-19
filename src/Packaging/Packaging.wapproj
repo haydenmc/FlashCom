@@ -36,14 +36,6 @@
       <Configuration>Release</Configuration>
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|AnyCPU">
-      <Configuration>Debug</Configuration>
-      <Platform>AnyCPU</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|AnyCPU">
-      <Configuration>Release</Configuration>
-      <Platform>AnyCPU</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup>
     <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
@@ -77,11 +69,6 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LaunchTree\LaunchTree.vcxproj">
-      <!--<Private>True</Private>-->
-      <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
-        <IncludeAssets>fmtd.dll</IncludeAssets>
-      <PrivateAssets>fmtd.dll</PrivateAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\LaunchTree\LaunchTree.vcxproj" />
   </ItemGroup>
 </Project>
