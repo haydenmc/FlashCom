@@ -8,8 +8,8 @@
 
   <Identity
     Name="44137a23-3609-4369-98f6-5c724595e008"
-    Publisher="CN=Hayden"
-    Version="1.0.0.0" />
+    Publisher="CN=LaunchTree Test"
+    Version="0.0.0.1" />
 
   <Properties>
     <DisplayName>LaunchTree</DisplayName>
