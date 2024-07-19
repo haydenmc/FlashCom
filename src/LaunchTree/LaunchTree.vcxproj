@@ -99,6 +99,8 @@
   <!-- Project Contents -->
   <ItemGroup>
     <None Include="packages.config" />
+    <ClCompile Include="Models\ActivateAumidTreeNode.cpp" />
+    <ClCompile Include="Models\LaunchUriTreeNode.cpp" />
     <ClCompile Include="Models\ShellExecuteTreeNode.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -119,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Models\ActivateAumidTreeNode.h" />
+    <ClInclude Include="Models\LaunchUriTreeNode.h" />
     <ClInclude Include="Models\ShellExecuteTreeNode.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="View\HostWindow.h" />
