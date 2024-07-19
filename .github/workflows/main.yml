@@ -11,6 +11,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: 'latest'
+      - run: nuget restore LaunchTree.sln
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build
