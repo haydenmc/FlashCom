@@ -12,6 +12,7 @@
 #include <winrt/Microsoft.Graphics.Canvas.Effects.h>
 #include <winrt/Microsoft.Graphics.Canvas.Text.h>
 #include <winrt/Microsoft.Graphics.Canvas.UI.Composition.h>
+#include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Graphics.Effects.h>
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.System.h>
@@ -38,6 +39,7 @@ namespace winrt
     namespace MGCE = Microsoft::Graphics::Canvas::Effects;
     namespace MGCT = Microsoft::Graphics::Canvas::Text;
     namespace MGCUC = Microsoft::Graphics::Canvas::UI::Composition;
+    namespace WF = Windows::Foundation;
     namespace WS = Windows::System;
     namespace WUIC = Windows::UI::Composition;
     namespace WUICD = Windows::UI::Composition::Desktop;

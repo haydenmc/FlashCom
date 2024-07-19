@@ -201,7 +201,7 @@ HostWindow::WindowShowTicket HostWindow::PrepareToShow()
 void HostWindow::Hide()
 {
     ::OutputDebugStringW(L"HostWindow::Hide\n");
-    winrt::check_bool(ShowWindow(m_hwnd, SW_HIDE));
+    ShowWindow(m_hwnd, SW_HIDE);
 }
 #pragma endregion Public
 }

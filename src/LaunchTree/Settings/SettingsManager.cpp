@@ -1,6 +1,8 @@
 #include <pch.h>
 #include "SettingsManager.h"
 
+#include "../Models/ActivateAumidTreeNode.h"
+#include "../Models/LaunchUriTreeNode.h"
 #include "../Models/ShellExecuteTreeNode.h"
 #include <fstream>
 #include <string_view>
@@ -15,6 +17,12 @@ namespace
             "key": "T",
             "children": [
                 {
+                    "name": "Alarms + Clock",
+                    "key": "A",
+                    "type": "aumid",
+                    "aumid": "Microsoft.WindowsAlarms_8wekyb3d8bbwe!App"
+                },
+                {
                     "name": "Calculator",
                     "key": "C",
                     "type": "shellExecute",
@@ -27,6 +35,12 @@ namespace
                     "type": "shellExecute",
                     "executeFile": "notepad.exe",
                     "executeParameters": ""
+                },
+                {
+                    "name": "Settings",
+                    "key": "S",
+                    "type": "uri",
+                    "uri": "ms-settings:"
                 }
             ]
         },
@@ -75,7 +89,8 @@ namespace
 
         if (json.contains("type") && json.at("type").is_string())
         {
-            if (json.at("type").get<std::string>() == "shellExecute")
+            auto nodeType{ json.at("type").get<std::string>() };
+            if (nodeType == "shellExecute")
             {
                 std::string executeParameters;
                 auto executeFile{ json.at("executeFile").get<std::string>() };
@@ -85,6 +100,18 @@ namespace
                 }
                 return std::make_unique<LaunchTree::Models::ShellExecuteTreeNode>(nodeKeyCode,
                     nodeName, executeFile, executeParameters);
+            }
+            else if (nodeType == "uri")
+            {
+                auto uri{ json.at("uri").get<std::string>() };
+                return std::make_unique<LaunchTree::Models::LaunchUriTreeNode>(nodeKeyCode,
+                    nodeName, uri);
+            }
+            else if (nodeType == "aumid")
+            {
+                auto aumid{ json.at("aumid").get<std::string>() };
+                return std::make_unique<LaunchTree::Models::ActivateAumidTreeNode>(nodeKeyCode,
+                    nodeName, aumid);
             }
             else
             {

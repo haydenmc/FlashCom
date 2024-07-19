@@ -137,8 +137,8 @@ namespace LaunchTree
                 }
                 else
                 {
-                    childNode->Execute();
                     Hide();
+                    childNode->Execute();
                 }
             }
         }
