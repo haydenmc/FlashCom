@@ -10,6 +10,7 @@
 
 namespace
 {
+    constexpr std::string_view c_logFileName{ "LaunchTree.log" };
     constexpr std::wstring_view c_windowTitle{ L"LaunchTree" };
     constexpr std::wstring_view c_windowClass{ L"LaunchTreeWindowClass" };
     HINSTANCE g_hInstance{ nullptr };
@@ -23,13 +24,18 @@ namespace
         }
         else
         {
-            // TODO: Log error "low-level keyboard input not handled"
+            SPDLOG_ERROR("HandleLowLevelKeyboardInput - Low level keyboard input unhandled, "
+                "callback not set.");
         }
     }
 
     int Run(HINSTANCE hInstance)
     {
         winrt::init_apartment(winrt::apartment_type::single_threaded);
+        auto logFilePath{
+            std::filesystem::path{ winrt::WStorage::ApplicationData::Current()
+                .LocalFolder().Path().c_str() } / c_logFileName };
+        InitializeLogging(logFilePath.string());
         g_app = LaunchTree::App::CreateApp(hInstance);
         LaunchTree::Input::SetGlobalLowLevelKeyboardCallback(HandleLowLevelKeyboardInput);
         return g_app->RunMessageLoop();

@@ -21,12 +21,15 @@
 #include <windows.ui.composition.interop.h>
 #include <winrt/Windows.UI.Text.h>
 
+// Logging
+#include "Logging.h"
+
 // External libraries
 #pragma warning(push, 0)
-#include <json.hpp>
+#include <json/json.hpp>
 #define UTF_CPP_CPLUSPLUS _MSVC_LANG // Fix for UTF8 C++ std version
                                      // https://github.com/nemtrif/utfcpp/issues/85
-#include <utf8.h>
+#include <utf8/utf8.h>
 #pragma warning(pop)
 
 // Resources
@@ -40,6 +43,7 @@ namespace winrt
     namespace MGCT = Microsoft::Graphics::Canvas::Text;
     namespace MGCUC = Microsoft::Graphics::Canvas::UI::Composition;
     namespace WF = Windows::Foundation;
+    namespace WStorage = Windows::Storage;
     namespace WS = Windows::System;
     namespace WUIC = Windows::UI::Composition;
     namespace WUICD = Windows::UI::Composition::Desktop;

@@ -21,7 +21,7 @@ namespace LaunchTree::Models
         ) };
         if (reinterpret_cast<INT_PTR>(executeResult) <= 32)
         {
-            // TODO: Log error
+            winrt::throw_last_error();
         }
     }
 }
