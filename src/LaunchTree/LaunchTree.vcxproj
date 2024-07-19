@@ -114,11 +114,13 @@
     <ClCompile Include="View\CompositionHost.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="View\TextVisual.cpp" />
+    <ClCompile Include="View\TrayIcon.cpp" />
     <ClCompile Include="View\Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Models\ShellExecuteTreeNode.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="View\HostWindow.h" />
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h" />
     <ClInclude Include="Models\DataModel.h" />
@@ -128,7 +130,14 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="View\ICompositionVisual.h" />
     <ClInclude Include="View\TextVisual.h" />
+    <ClInclude Include="View\TrayIcon.h" />
     <ClInclude Include="View\Ui.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\icon.ico" />
   </ItemGroup>
   <!-- /Project Contents -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

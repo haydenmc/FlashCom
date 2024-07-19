@@ -41,6 +41,8 @@ namespace LaunchTree
             case WM_KEYUP:
                 OnKeyUp(static_cast<uint8_t>(msg.wParam));
                 break;
+            case WM_CLOSE:
+                return 0;
             default:
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
@@ -107,7 +109,11 @@ namespace LaunchTree
     App::App(const HINSTANCE& hInstance) :
         m_dataModel{ std::move(CreateDataModel(m_settingsManager)) },
         m_hostWindow{ hInstance, L"LaunchTree", std::bind(&App::HandleFocusLost, this) },
-        m_ui{m_hostWindow, m_dataModel.get()}
+        m_trayIcon{ hInstance, {
+            std::make_pair(std::wstring{ L"Settings" }, std::bind(&App::OnSettingsCommand, this)),
+            std::make_pair(std::wstring{ L"Exit" }, std::bind(&App::OnExitCommand, this))
+        } },
+        m_ui{ m_hostWindow, m_dataModel.get() }
     { }
 
     void App::HandleFocusLost()
@@ -155,6 +161,16 @@ namespace LaunchTree
         m_ui.Hide();
         m_dataModel->CurrentNode = m_dataModel->RootNode.get();
         m_ui.Update();
+    }
+
+    void App::OnSettingsCommand()
+    {
+        OutputDebugStringW(L"Settings invoked");
+    }
+
+    void App::OnExitCommand()
+    {
+        PostMessageW(nullptr, WM_CLOSE, 0, 0);
     }
 #pragma endregion Private
 }

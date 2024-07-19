@@ -2,6 +2,7 @@
 #include "Models/DataModel.h"
 #include "Settings/SettingsManager.h"
 #include "View/HostWindow.h"
+#include "View/TrayIcon.h"
 #include "View/Ui.h"
 
 #include <cstdint>
@@ -21,6 +22,7 @@ namespace LaunchTree
         Settings::SettingsManager m_settingsManager;
         std::unique_ptr<Models::DataModel> const m_dataModel;
         View::HostWindow m_hostWindow;
+        View::TrayIcon m_trayIcon;
         View::Ui m_ui;
         std::unordered_set<uint32_t> m_hotkeysPressed;
         bool m_isShowing{ false };
@@ -31,5 +33,7 @@ namespace LaunchTree
         void OnKeyUp(uint8_t vkeyCode);
         void Show();
         void Hide();
+        void OnSettingsCommand();
+        void OnExitCommand();
     };
 }

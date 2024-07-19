@@ -27,6 +27,9 @@
 #include <utf8.h>
 #pragma warning(pop)
 
+// Resources
+#include "resource.h"
+
 // Namespace aliases
 namespace winrt
 {
