@@ -14,16 +14,18 @@ namespace
     HINSTANCE g_hInstance{ nullptr };
     std::unique_ptr<FlashCom::App> g_app{ nullptr };
 
-    void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
+    FlashCom::Input::LowLevelCallbackReturnKind HandleLowLevelKeyboardInput(
+        WPARAM wParam, KBDLLHOOKSTRUCT* kb)
     {
         if (g_app)
         {
-            g_app->HandleLowLevelKeyboardInput(wParam, kb);
+            return g_app->HandleLowLevelKeyboardInput(wParam, kb);
         }
         else
         {
             SPDLOG_ERROR("HandleLowLevelKeyboardInput - Low level keyboard input unhandled, "
                 "callback not set.");
+            return FlashCom::Input::LowLevelCallbackReturnKind::Unhandled;
         }
     }
 

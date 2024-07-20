@@ -5,5 +5,11 @@
 
 namespace FlashCom::Input
 {
-    void SetGlobalLowLevelKeyboardCallback(std::function<void(WPARAM, KBDLLHOOKSTRUCT*)> callback);
+    enum class LowLevelCallbackReturnKind
+    {
+        Handled,
+        Unhandled,
+    };
+    void SetGlobalLowLevelKeyboardCallback(
+        std::function<LowLevelCallbackReturnKind(WPARAM, KBDLLHOOKSTRUCT*)> callback);
 }

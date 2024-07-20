@@ -52,12 +52,13 @@ namespace FlashCom
         return (int)msg.wParam;
     }
 
-    void App::HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb)
+    FlashCom::Input::LowLevelCallbackReturnKind App::HandleLowLevelKeyboardInput(
+        WPARAM wParam, KBDLLHOOKSTRUCT* kb)
     {
         // Ignore non-hotkey keys
         if (c_hotkeyCombo.count(kb->vkCode) == 0)
         {
-            return;
+            return FlashCom::Input::LowLevelCallbackReturnKind::Unhandled;
         }
 
         bool isKeyDown{ false };
@@ -74,7 +75,7 @@ namespace FlashCom
             isKeyDown = false;
             break;
         default:
-            return;
+            return FlashCom::Input::LowLevelCallbackReturnKind::Unhandled;
         }
 
         if (isKeyDown)
@@ -90,7 +91,19 @@ namespace FlashCom
         {
             SPDLOG_INFO("App::HandleLowLevelKeyboardInput - Hotkey pressed");
             ToggleVisibility();
+
+            // This dummy event is to prevent Start from thinking that the Win key was
+            // just pressed.
+            // See https://github.com/microsoft/PowerToys/pull/4874
+            INPUT dummyEvent[1] = {};
+            dummyEvent[0].type = INPUT_KEYBOARD;
+            dummyEvent[0].ki.wVk = 0xFF;
+            dummyEvent[0].ki.dwFlags = KEYEVENTF_KEYUP;
+            SendInput(1, dummyEvent, sizeof(INPUT));
+
+            return FlashCom::Input::LowLevelCallbackReturnKind::Handled;
         }
+        return FlashCom::Input::LowLevelCallbackReturnKind::Unhandled;
     }
 
     void App::ToggleVisibility()
