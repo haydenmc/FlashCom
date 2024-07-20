@@ -7,12 +7,12 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="44137a23-3609-4369-98f6-5c724595e008"
-    Publisher="CN=LaunchTree Test"
+    Name="FlashCom"
+    Publisher="CN=FlashCom Test"
     Version="0.0.0.1" />
 
   <Properties>
-    <DisplayName>LaunchTree</DisplayName>
+    <DisplayName>FlashCom</DisplayName>
     <PublisherDisplayName>Hayden McAfee</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
@@ -31,13 +31,16 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="LaunchTree"
-        Description="A fast launcher for power-users"
+        DisplayName="FlashCom"
+        Description="A lightning fast launcher for power-users"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Images\SplashScreen.png" />
+        <uap:DefaultTile >
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
       </uap:VisualElements>
     </Application>
   </Applications>

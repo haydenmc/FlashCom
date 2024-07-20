@@ -14,11 +14,11 @@ jobs:
       - uses: nuget/setup-nuget@v2
         with:
           nuget-version: 'latest'
-      - run: nuget restore LaunchTree.sln
+      - run: nuget restore FlashCom.sln
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build
-        run: msbuild LaunchTree.sln /p:ProjectName="LaunchTree" /p:Configuration="Release" /p:Platform="x64" /p:AppxBundle="Always" /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="6de63fea060da67479e25dfaa28619111060bac3" /p:PackageCertificateKeyFile="Packaging_TemporaryKey.pfx" /p:UapAppxPackageBuildMode="Sideload" /p:AppxBundlePlatforms="x64|ARM64" /p:AppxPackageDir="AppPackages"
+        run: msbuild FlashCom.sln /p:ProjectName="FlashCom" /p:Configuration="Release" /p:Platform="x64" /p:AppxBundle="Always" /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="6de63fea060da67479e25dfaa28619111060bac3" /p:PackageCertificateKeyFile="Packaging_TemporaryKey.pfx" /p:UapAppxPackageBuildMode="Sideload" /p:AppxBundlePlatforms="x64|ARM64" /p:AppxPackageDir="AppPackages"
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
