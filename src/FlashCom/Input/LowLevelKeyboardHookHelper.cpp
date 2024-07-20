@@ -7,7 +7,8 @@ namespace
 {
     std::shared_mutex g_lowLevelKeyboardHookMutex;
     ::HHOOK g_hHook{ 0 };
-    std::function<void(WPARAM, KBDLLHOOKSTRUCT*)> g_lowLevelKeyboardCallback;
+    std::function<FlashCom::Input::LowLevelCallbackReturnKind(WPARAM, KBDLLHOOKSTRUCT*)>
+        g_lowLevelKeyboardCallback;
 
     LRESULT LowLevelKeyboardProc(
         int nCode,
@@ -15,24 +16,36 @@ namespace
         LPARAM lParam
     )
     {
+        // See https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelkeyboardproc
+        if (nCode < 0)
+        {
+            return ::CallNextHookEx(0, nCode, wParam, lParam);
+        }
+        bool callNextHook{ true };
         {
             std::shared_lock lock{ g_lowLevelKeyboardHookMutex };
             if (g_lowLevelKeyboardCallback)
             {
-                g_lowLevelKeyboardCallback(
+                auto callbackResult{ g_lowLevelKeyboardCallback(
                     wParam,
                     reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam)
-                );
+                ) };
+                callNextHook = (callbackResult ==
+                    FlashCom::Input::LowLevelCallbackReturnKind::Unhandled);
             }
         }
-
-        return ::CallNextHookEx(0, nCode, wParam, lParam);
+        if (callNextHook)
+        {
+            return ::CallNextHookEx(0, nCode, wParam, lParam);
+        }
+        return 1;
     }
 }
 
 namespace FlashCom::Input
 {
-    void SetGlobalLowLevelKeyboardCallback(std::function<void(WPARAM, KBDLLHOOKSTRUCT*)> callback)
+    void SetGlobalLowLevelKeyboardCallback(
+        std::function<LowLevelCallbackReturnKind(WPARAM, KBDLLHOOKSTRUCT*)> callback)
     {
         std::unique_lock lock{ g_lowLevelKeyboardHookMutex };
         if (g_hHook)

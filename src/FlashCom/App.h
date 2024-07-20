@@ -1,4 +1,5 @@
 #pragma once
+#include "Input/LowLevelKeyboardHookHelper.h"
 #include "Models/DataModel.h"
 #include "Settings/SettingsManager.h"
 #include "View/HostWindow.h"
@@ -15,7 +16,8 @@ namespace FlashCom
     {
         static std::unique_ptr<App> CreateApp(const HINSTANCE& hInstance);
         int RunMessageLoop();
-        void HandleLowLevelKeyboardInput(WPARAM wParam, KBDLLHOOKSTRUCT* kb);
+        FlashCom::Input::LowLevelCallbackReturnKind HandleLowLevelKeyboardInput(
+            WPARAM wParam, KBDLLHOOKSTRUCT* kb);
         void ToggleVisibility();
 
     private:
