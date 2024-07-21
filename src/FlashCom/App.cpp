@@ -132,6 +132,7 @@ namespace FlashCom
         m_hostWindow{ hInstance, L"FlashCom", std::bind(&App::HandleFocusLost, this) },
         m_trayIcon{ hInstance, {
             std::make_pair(std::wstring{ L"Settings" }, std::bind(&App::OnSettingsCommand, this)),
+            std::make_pair(std::wstring{ L"Reload" }, std::bind(&App::OnReloadCommand, this)),
             std::make_pair(std::wstring{ L"Exit" }, std::bind(&App::OnExitCommand, this))
         } },
         m_ui{ m_hostWindow, m_dataModel.get() }
@@ -194,6 +195,13 @@ namespace FlashCom
         ShellExecuteW(nullptr, L"explore",
             m_settingsManager.GetSettingsFilePath().parent_path().wstring().data(),
             nullptr, nullptr, SW_SHOWNORMAL);
+    }
+
+    void App::OnReloadCommand()
+    {
+        SPDLOG_INFO("App::OnReloadCommand");
+        LoadDataModel();
+        m_ui.Update();
     }
 
     void App::OnExitCommand()

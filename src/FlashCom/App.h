@@ -37,6 +37,7 @@ namespace FlashCom
         void Show();
         void Hide();
         void OnSettingsCommand();
+        void OnReloadCommand();
         void OnExitCommand();
     };
 }
