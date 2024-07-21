@@ -52,12 +52,28 @@ namespace
         drawingSession.DrawTextLayout(
             textLayout,
             { 0, 0 },
-            winrt::WUI::Colors::White()
+            winrt::WUI::Color{ 255, 192, 192, 192 }
         );
+        auto drawingBrush{ compositor.CreateSurfaceBrush(drawingSurface) };
+
+        // Try a blend mode
+        winrt::MGCE::BlendEffect blendEffect{};
+        blendEffect.Name(L"Blend");
+        blendEffect.Mode(winrt::MGCE::BlendEffectMode::ColorDodge);
+        blendEffect.Background(winrt::WUIC::CompositionEffectSourceParameter{ L"backdrop" });
+        blendEffect.Foreground(winrt::WUIC::CompositionEffectSourceParameter{ L"text" });
+        winrt::WUIC::CompositionEffectFactory blendEffectFactory{
+            compositor.CreateEffectFactory(blendEffect) };
+        winrt::WUIC::CompositionEffectBrush blendBrush{
+            blendEffectFactory.CreateBrush() };
+
+        auto backdropBrush{ compositor.CreateBackdropBrush() };
+        blendBrush.SetSourceParameter(L"backdrop", backdropBrush);
+        blendBrush.SetSourceParameter(L"text", drawingBrush);
 
         // Create composition visual
         auto spriteVisual{ compositor.CreateSpriteVisual() };
-        spriteVisual.Brush(compositor.CreateSurfaceBrush(drawingSurface));
+        spriteVisual.Brush(blendBrush);
         spriteVisual.Size(drawingSurface.Size());
 
         return spriteVisual;
