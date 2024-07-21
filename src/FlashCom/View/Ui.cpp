@@ -4,7 +4,7 @@
 
 namespace
 {
-    constexpr float c_bufferBetweenKeyAndName{ 32 };
+    constexpr float c_bufferBetweenKeyAndName{ 64 };
     constexpr float c_bufferBetweenNodes{ 32 };
 }
 
@@ -37,12 +37,13 @@ namespace FlashCom::View
         // Create text visuals for each child node
         winrt::MGCT::CanvasTextFormat nameTextFormat;
         nameTextFormat.FontFamily(L"Segoe UI");
-        nameTextFormat.FontSize(64);
-        nameTextFormat.FontWeight(winrt::WUIT::FontWeights::Normal());
+        nameTextFormat.FontSize(72);
+        nameTextFormat.FontWeight(winrt::WUIT::FontWeights::SemiLight());
         winrt::MGCT::CanvasTextFormat keyTextFormat;
         keyTextFormat.FontFamily(L"Segoe UI");
-        keyTextFormat.FontSize(64);
+        keyTextFormat.FontSize(72);
         keyTextFormat.FontWeight(winrt::WUIT::FontWeights::Black());
+        keyTextFormat.HorizontalAlignment(winrt::MGCT::CanvasHorizontalAlignment::Left);
         std::vector<std::pair<winrt::WUIC::Visual, winrt::WUIC::Visual>> nodeVisuals;
         float maxKeyWidth{ 0 };
         float maxNameWidth{ 0 };
@@ -69,9 +70,10 @@ namespace FlashCom::View
         for (size_t i{ 0 }; i < nodeVisuals.size(); ++i)
         {
             auto& keyVisual{ nodeVisuals.at(i).first };
+            auto keyXOffset{ (maxKeyWidth - keyVisual.Size().x) / 2.0f };
             auto& textVisual{ nodeVisuals.at(i).second };
             float nodeYOffset{ yOffset + (i * c_bufferBetweenNodes) + (i * maxHeight) };
-            keyVisual.Offset({ xOffset, nodeYOffset, 0 });
+            keyVisual.Offset({ (xOffset + keyXOffset), nodeYOffset, 0 });
             textVisual.Offset({ (xOffset + maxKeyWidth + c_bufferBetweenKeyAndName),
                 nodeYOffset, 0 });
             rootVisual.Children().InsertAtTop(keyVisual);

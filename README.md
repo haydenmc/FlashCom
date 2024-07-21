@@ -10,6 +10,8 @@ the tree.
 and uses Windows Composition APIs to render beautiful visuals without a heavy
 UI framework or bundled browser.
 
+[![Screenshot of FlashCom with some example commands](design/Screenshot.png)](design/Screenshot.png)
+
 # Third Party Libraries
 
 ## [nlohmann/json](https://github.com/nlohmann/json)
