@@ -15,6 +15,7 @@ namespace FlashCom
     struct App
     {
         static std::unique_ptr<App> CreateApp(const HINSTANCE& hInstance);
+        void LoadDataModel();
         int RunMessageLoop();
         FlashCom::Input::LowLevelCallbackReturnKind HandleLowLevelKeyboardInput(
             WPARAM wParam, KBDLLHOOKSTRUCT* kb);

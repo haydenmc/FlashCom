@@ -5,10 +5,8 @@ namespace FlashCom::Models
 {
     struct DataModel
     {
-        DataModel(std::unique_ptr<TreeNode>&& rootNode);
-        DataModel(DataModel&& other) = default;
-
-        const std::unique_ptr<TreeNode> RootNode;
+        std::string LoadErrorMessage;
+        std::shared_ptr<TreeNode> RootNode;
         TreeNode* CurrentNode{ nullptr };
     };
 }

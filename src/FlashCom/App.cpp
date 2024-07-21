@@ -8,16 +8,6 @@
 namespace
 {
     const std::unordered_set<uint32_t> c_hotkeyCombo{ VK_LWIN, VK_SPACE };
-
-    std::unique_ptr<FlashCom::Models::DataModel> CreateDataModel(
-        FlashCom::Settings::SettingsManager& settingsManager)
-    {
-
-        auto rootNode{ settingsManager.GetTree() };
-
-        return std::make_unique<FlashCom::Models::DataModel>(
-            std::move(rootNode));
-    }
 }
 
 namespace FlashCom
@@ -25,7 +15,24 @@ namespace FlashCom
 #pragma region Public
     std::unique_ptr<App> App::CreateApp(const HINSTANCE& hInstance)
     {
-        return std::unique_ptr<App>(new App(hInstance));
+        std::unique_ptr<App> app{ new App(hInstance) };
+        app->LoadDataModel();
+        return app;
+    }
+
+    void App::LoadDataModel()
+    {
+        auto result{ m_settingsManager.LoadSettings() };
+        m_dataModel->RootNode = m_settingsManager.GetCommandTreeRoot();
+        m_dataModel->CurrentNode = m_dataModel->RootNode.get();
+        if (!result.has_value())
+        {
+            m_dataModel->LoadErrorMessage = result.error();
+        }
+        else
+        {
+            m_dataModel->LoadErrorMessage = "";
+        }
     }
 
     int App::RunMessageLoop()
@@ -121,7 +128,7 @@ namespace FlashCom
 #pragma endregion Public
 #pragma region Private
     App::App(const HINSTANCE& hInstance) :
-        m_dataModel{ std::move(CreateDataModel(m_settingsManager)) },
+        m_dataModel{ std::make_unique<FlashCom::Models::DataModel>() },
         m_hostWindow{ hInstance, L"FlashCom", std::bind(&App::HandleFocusLost, this) },
         m_trayIcon{ hInstance, {
             std::make_pair(std::wstring{ L"Settings" }, std::bind(&App::OnSettingsCommand, this)),
