@@ -148,6 +148,12 @@ namespace FlashCom
 
     void App::OnKeyDown(uint8_t vkeyCode)
     {
+        if (vkeyCode == VK_ESCAPE)
+        {
+            SPDLOG_INFO("App::OnKeyDown - Escape key pressed; hiding");
+            Hide();
+            return;
+        }
         for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
         {
             if (childNode->GetVkCode() == vkeyCode)
