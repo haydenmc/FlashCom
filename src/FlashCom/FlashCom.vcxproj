@@ -114,9 +114,8 @@
     <ClCompile Include="Models\DataModel.cpp" />
     <ClCompile Include="Models\TreeNode.cpp" />
     <ClCompile Include="Settings\SettingsManager.cpp" />
-    <ClCompile Include="View\CompositionHost.cpp" />
+    <ClCompile Include="View\CompositionManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="View\TextVisual.cpp" />
     <ClCompile Include="View\TrayIcon.cpp" />
     <ClCompile Include="View\Ui.cpp" />
   </ItemGroup>
@@ -132,10 +131,8 @@
     <ClInclude Include="Models\DataModel.h" />
     <ClInclude Include="Models\TreeNode.h" />
     <ClInclude Include="Settings\SettingsManager.h" />
-    <ClInclude Include="View\CompositionHost.h" />
+    <ClInclude Include="View\CompositionManager.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="View\ICompositionVisual.h" />
-    <ClInclude Include="View\TextVisual.h" />
     <ClInclude Include="View\TrayIcon.h" />
     <ClInclude Include="View\Ui.h" />
   </ItemGroup>

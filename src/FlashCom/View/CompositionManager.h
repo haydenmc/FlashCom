@@ -1,25 +1,25 @@
 #pragma once
 #include "HostWindow.h"
-#include "ICompositionVisual.h"
 
 #include <vector>
 
 namespace FlashCom::View
 {
-    class CompositionHost
+    struct BrushWithBounds
+    {
+        winrt::WF::Size Bounds;
+        winrt::WUIC::CompositionSurfaceBrush Brush;
+    };
+
+    class CompositionManager
     {
     public:
-        CompositionHost(HostWindow const & hostWindow);
-
-        winrt::Windows::UI::Composition::ContainerVisual CreateRootVisual();
+        CompositionManager(HostWindow const & hostWindow);
+        winrt::Windows::UI::Composition::Compositor GetCompositor();
         void PresentRootVisual(
             winrt::Windows::UI::Composition::ContainerVisual rootVisual);
-
-        template<class C, class... Args>
-        std::unique_ptr<C> CreateVisual(Args... args)
-        {
-            return std::make_unique<C>(m_compositor, m_canvasDevice, m_graphicsDevice, args...);
-        }
+        BrushWithBounds CreateTextBrush(winrt::MGCT::CanvasTextFormat textFormat,
+            std::string_view content);
 
     private:
         HostWindow const & m_hostWindow;
@@ -31,7 +31,5 @@ namespace FlashCom::View
         const winrt::Microsoft::Graphics::Canvas::CanvasDevice m_canvasDevice{ nullptr };
         const winrt::Windows::UI::Composition::CompositionGraphicsDevice
             m_graphicsDevice{ nullptr };
-
-        std::vector<std::unique_ptr<ICompositionVisual>> m_visuals;
     };
 }

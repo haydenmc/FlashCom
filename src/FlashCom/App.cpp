@@ -162,7 +162,7 @@ namespace FlashCom
                 {
                     SPDLOG_INFO("App::OnKeyDown - Navigating to {}", childNode->GetName());
                     m_dataModel->CurrentNode = childNode;
-                    m_ui.Update();
+                    m_ui.Update(View::UpdateReasonKind::Navigating);
                 }
                 else
                 {
@@ -175,9 +175,7 @@ namespace FlashCom
     }
 
     void App::OnKeyUp(uint8_t /*vkeyCode*/)
-    {
-
-    }
+    { }
 
     void App::Show()
     {
@@ -192,7 +190,7 @@ namespace FlashCom
         m_isShowing = false;
         m_ui.Hide();
         m_dataModel->CurrentNode = m_dataModel->RootNode.get();
-        m_ui.Update();
+        m_ui.Update(View::UpdateReasonKind::Hiding);
     }
 
     void App::OnSettingsCommand()
@@ -207,7 +205,7 @@ namespace FlashCom
     {
         SPDLOG_INFO("App::OnReloadCommand");
         LoadDataModel();
-        m_ui.Update();
+        m_ui.Update(View::UpdateReasonKind::Reloading);
     }
 
     void App::OnExitCommand()
