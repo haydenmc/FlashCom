@@ -33,14 +33,11 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="View\CompositionHost.cpp">
+    <ClCompile Include="View\CompositionManager.cpp">
       <Filter>Source Files\View</Filter>
     </ClCompile>
     <ClCompile Include="Input\LowLevelKeyboardHookHelper.cpp">
       <Filter>Source Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="View\TextVisual.cpp">
-      <Filter>Source Files\View</Filter>
     </ClCompile>
     <ClCompile Include="Settings\SettingsManager.cpp">
       <Filter>Source Files</Filter>
@@ -83,17 +80,11 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="View\CompositionHost.h">
+    <ClInclude Include="View\CompositionManager.h">
       <Filter>Header Files\View</Filter>
     </ClInclude>
     <ClInclude Include="Input\LowLevelKeyboardHookHelper.h">
       <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="View\ICompositionVisual.h">
-      <Filter>Header Files\View</Filter>
-    </ClInclude>
-    <ClInclude Include="View\TextVisual.h">
-      <Filter>Header Files\View</Filter>
     </ClInclude>
     <ClInclude Include="Settings\SettingsManager.h">
       <Filter>Header Files</Filter>

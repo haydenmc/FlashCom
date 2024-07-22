@@ -1,10 +1,6 @@
 #include <pch.h>
-
-#include "CompositionHost.h"
-#include "TextVisual.h"
-
+#include "CompositionManager.h"
 #include <DispatcherQueue.h>
-
 
 namespace
 {
@@ -28,9 +24,7 @@ namespace
     }
 
     inline winrt::WUICD::DesktopWindowTarget CreateDesktopWindowTarget(
-        HWND window,
-        winrt::WUIC::Compositor compositor
-    )
+        HWND window, winrt::WUIC::Compositor compositor)
     {
         namespace abi = ABI::Windows::UI::Composition::Desktop;
 
@@ -48,7 +42,7 @@ namespace
 namespace FlashCom::View
 {
 #pragma region Public
-    CompositionHost::CompositionHost(HostWindow const& hostWindow) :
+    CompositionManager::CompositionManager(HostWindow const& hostWindow) :
         m_hostWindow{ hostWindow },
         m_dispatcherQueueController{ CreateDispatcherQueue() },
         m_compositor{ winrt::WUIC::Compositor{} },
@@ -63,43 +57,51 @@ namespace FlashCom::View
         }
     { }
 
-    winrt::WUIC::ContainerVisual CompositionHost::CreateRootVisual()
+    winrt::Windows::UI::Composition::Compositor CompositionManager::GetCompositor()
     {
-        auto root{ m_compositor.CreateContainerVisual() };
-        root.RelativeSizeAdjustment({ 1.0f, 1.0f });
-        root.Offset({ 0, 0, 0 });
-
-        // Create background
-        // TODO: Allow this to be customized.
-        winrt::Windows::UI::Color bgColor{ 255, 128, 128, 128 };
-        winrt::MGCE::ColorSourceEffect bgColorEffect{};
-        bgColorEffect.Color(bgColor);
-        winrt::MGCE::BlendEffect blendEffect{};
-        blendEffect.Name(L"Blend");
-        blendEffect.Mode(winrt::MGCE::BlendEffectMode::LinearBurn);
-        blendEffect.Background(winrt::WUIC::CompositionEffectSourceParameter{ L"source" });
-        blendEffect.Foreground(bgColorEffect);
-        winrt::WUIC::CompositionEffectFactory blendEffectFactory{
-            m_compositor.CreateEffectFactory(blendEffect)
-        };
-        winrt::WUIC::CompositionEffectBrush blendBrush{
-            blendEffectFactory.CreateBrush()
-        };
-        auto backdropBrush{ m_compositor.CreateBackdropBrush() };
-        blendBrush.SetSourceParameter(L"source", backdropBrush);
-        auto backgroundVisual{ m_compositor.CreateSpriteVisual() };
-        backgroundVisual.Brush(blendBrush);
-        backgroundVisual.RelativeSizeAdjustment({ 1, 1 });
-        backgroundVisual.AnchorPoint({ 0.5, 0.5 });
-        backgroundVisual.RelativeOffsetAdjustment({ 0.5, 0.5, 0 });
-        root.Children().InsertAtBottom(backgroundVisual);
-
-        return root;
+        return m_compositor;
     }
 
-    void CompositionHost::PresentRootVisual(winrt::WUIC::ContainerVisual rootVisual)
+    void CompositionManager::PresentRootVisual(winrt::WUIC::ContainerVisual rootVisual)
     {
         m_target.Root(rootVisual);
+    }
+
+    BrushWithBounds CompositionManager::CreateTextBrush(
+        winrt::MGCT::CanvasTextFormat textFormat, std::string_view content)
+    {
+        // Compute bounds of text
+        winrt::MGCT::CanvasTextLayout textLayout{
+            m_canvasDevice,
+            winrt::to_hstring(content),
+            textFormat,
+            0,
+            0
+        };
+        textLayout.WordWrapping(winrt::MGCT::CanvasWordWrapping::NoWrap);
+        auto textBounds{ textLayout.LayoutBounds() };
+
+        // Draw text
+        auto drawingSurface{
+            m_graphicsDevice.CreateDrawingSurface(
+                { textBounds.Width, textBounds.Height },
+                winrt::WGDX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+                winrt::WGDX::DirectXAlphaMode::Premultiplied
+            )
+        };
+        auto drawingSession{
+            winrt::MGCUC::CanvasComposition::CreateDrawingSession(drawingSurface)
+        };
+        drawingSession.Clear(winrt::WUI::Colors::Transparent());
+        drawingSession.DrawTextLayout(
+            textLayout,
+            { 0, 0 },
+            winrt::WUI::Color{ 255, 192, 192, 192 }
+        );
+        return {
+            .Bounds = drawingSurface.Size(),
+            .Brush = m_compositor.CreateSurfaceBrush(drawingSurface)
+        };
     }
 #pragma endregion Public
 }
