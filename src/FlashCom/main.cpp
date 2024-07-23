@@ -32,9 +32,7 @@ namespace
     int Run(HINSTANCE hInstance)
     {
         winrt::init_apartment(winrt::apartment_type::single_threaded);
-        auto logFilePath{
-            std::filesystem::path{ winrt::WStorage::ApplicationData::Current()
-                .LocalFolder().Path().c_str() } / c_logFileName };
+        auto logFilePath{ FlashCom::Settings::GetApplicationLocalDataDirectory() / c_logFileName };
         InitializeLogging(logFilePath.string());
         g_app = FlashCom::App::CreateApp(hInstance);
         FlashCom::Input::SetGlobalLowLevelKeyboardCallback(HandleLowLevelKeyboardInput);

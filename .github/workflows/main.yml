@@ -19,8 +19,24 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build
         run: msbuild FlashCom.sln /p:ProjectName="FlashCom" /p:Configuration="Release" /p:Platform="x64" /p:AppxBundle="Always" /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="feedcf964fdcb3e04e4b27f86536cb269e40f873" /p:PackageCertificateKeyFile="Packaging_TemporaryKey.pfx" /p:UapAppxPackageBuildMode="Sideload" /p:AppxBundlePlatforms="x64|ARM64" /p:AppxPackageDir="AppPackages"
-      - name: Upload Artifact
+      - name: Upload App Package Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AppPackage
-          path: src/Packaging/AppPackages
+          name: FlashCom_AppPackage
+          path: |
+            src/Packaging/AppPackages/**/*
+            !src/Packaging/AppPackages/*.msixupload
+      - name: Upload x64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlashCom_x64
+          path: |
+            build/bin/x64/Release/FlashCom/*
+            !build/bin/x64/Release/FlashCom/*.pdb
+      - name: Upload ARM64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlashCom_ARM64
+          path: |
+            build/bin/ARM64/Release/FlashCom/*
+            !build/bin/ARM64/Release/FlashCom/*.pdb
