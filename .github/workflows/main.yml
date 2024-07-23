@@ -23,7 +23,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: FlashCom_AppPackage
-          path: src/Packaging/AppPackages/Packaging_*/**/*
+          path: |
+            src/Packaging/AppPackages/Packaging_*/**
       - name: Upload x64 Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -34,7 +35,7 @@ jobs:
       - name: Upload ARM64 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FlashCom_x64
+          name: FlashCom_ARM64
           path: |
             build/bin/ARM64/Release/FlashCom/*
             !build/bin/ARM64/Release/FlashCom/*.pdb
