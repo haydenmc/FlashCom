@@ -5,10 +5,12 @@
 #include "../Models/LaunchUriTreeNode.h"
 #include "../Models/ShellExecuteTreeNode.h"
 #include <fstream>
+#include <ShlObj_core.h>
 #include <string_view>
 
 namespace
 {
+    constexpr std::string_view c_appDataLocalDirectoryName{ "FlashCom" };
     constexpr std::string_view c_settingsFileName{ "settings.json" };
     // JSON property names
     constexpr std::string_view c_commandsJsonProperty{ "commands" };
@@ -71,8 +73,7 @@ namespace
 
     std::filesystem::path GetSettingsFilePath()
     {
-        return std::filesystem::path{ winrt::WStorage::ApplicationData::Current()
-            .LocalFolder().Path().c_str() } / c_settingsFileName;
+        return FlashCom::Settings::GetApplicationLocalDataDirectory() / c_settingsFileName;
     }
 
     bool IsValidKeyString(const std::string& key)
@@ -268,6 +269,39 @@ namespace
 
 namespace FlashCom::Settings
 {
+    std::filesystem::path GetApplicationLocalDataDirectory()
+    {
+        static std::optional<std::filesystem::path> appLocalDataDir;
+        if (appLocalDataDir.has_value())
+        {
+            return appLocalDataDir.value();
+        }
+
+        // If this app is running inside of a Windows Package, we should use the appropriate
+        // app package data directory.
+        try
+        {
+            appLocalDataDir = winrt::WStorage::ApplicationData::Current()
+                .LocalFolder().Path().c_str();
+            return appLocalDataDir.value();
+        }
+        catch (const winrt::hresult_error& e)
+        {
+            // The only error we expect to see here is "process has no package identity".
+            if (e.code() != 0x80073D54)
+            {
+                throw e;
+            }
+        }
+        // Otherwise, just use %LOCALAPPDATA%
+        wil::unique_cotaskmem_string appDataFolderString;
+        winrt::check_hresult(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr,
+            appDataFolderString.put()));
+        appLocalDataDir = (std::filesystem::path{ appDataFolderString.get() } /
+            c_appDataLocalDirectoryName);
+        return appLocalDataDir.value();
+    }
+
     SettingsManager::SettingsManager() : m_settingsFilePath{ ::GetSettingsFilePath() }
     {
         if (!std::filesystem::exists(m_settingsFilePath))

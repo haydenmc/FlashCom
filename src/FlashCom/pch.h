@@ -23,6 +23,9 @@
 #include <windows.ui.composition.interop.h>
 #include <winrt/Windows.UI.Text.h>
 
+// WIL
+#include <wil/resource.h>
+
 // Logging
 #include "Logging.h"
 

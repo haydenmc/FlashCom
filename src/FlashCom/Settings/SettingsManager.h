@@ -6,6 +6,8 @@
 
 namespace FlashCom::Settings
 {
+    std::filesystem::path GetApplicationLocalDataDirectory();
+
     struct SettingsManager
     {
         SettingsManager();
