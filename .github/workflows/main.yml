@@ -25,7 +25,7 @@ jobs:
           name: FlashCom_AppPackage
           path: |
             src/Packaging/AppPackages/**/*
-            !*.msixupload
+            !src/Packaging/AppPackages/*.msixupload
       - name: Upload x64 Artifact
         uses: actions/upload-artifact@v4
         with:
