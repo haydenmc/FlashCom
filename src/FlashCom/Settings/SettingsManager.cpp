@@ -31,6 +31,12 @@ namespace
     constexpr std::string_view c_defaultSettingsFileContents{ R"({
     "commands": [
         {
+            "name": "README",
+            "key": "R",
+            "type": "uri",
+            "uri": "https://github.com/haydenmc/FlashCom/blob/main/README.md"
+        },
+        {
             "name": "Tools",
             "key": "T",
             "children": [

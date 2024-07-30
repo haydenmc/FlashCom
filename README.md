@@ -17,7 +17,11 @@ UI framework or bundled browser.
 Download the [latest release from GitHub](https://github.com/haydenmc/FlashCom/releases/latest),
 or [install from the Windows Store](https://apps.microsoft.com/detail/9P46ZB80RWL8).
 
-After launching FlashCom it will appear in your system tray as a pink lightning bolt.
+Be sure to install the latest
+[Microsoft VC Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version)
+if you are not using the packaged or Windows Store app.
+
+After launching, FlashCom will appear in your system tray as a pink lightning bolt.
 
 ![Screenshot of FlashCom tray icon](design/TrayIcon.png)
 
@@ -36,6 +40,12 @@ For the packaged app, `settings.json` is located in `%LOCALAPPDATA%\Packages\164
 For the unpackaged app, `settings.json` is located in `%LOCALAPPDATA%\FlashCom`.
 
 ## Commands
+
+| Name         | "type"           | Description                                |
+| ------------ | ---------------- | ------------------------------------------ |
+| [ShellExecute Command](#shellexecute-command) | `"shellExecute"` | Launches arbitrary Windows executables. |
+| [URI Command](#uri-command) | `"uri"` | Activates the given URI with the default protocol handler. |
+| [AUMID Command](#aumid-command) | `"aumid"` | Activates the Windows Packaged app with the given AUMID. |
 
 The `"commands"` field defines the set of commands shown in FlashCom:
 
@@ -93,10 +103,19 @@ commands don't have a `"type"` field, but instead have a `"children"` field:
 }
 ```
 
-### ShellExecute Commands
+### ShellExecute Command
 
 These commands simply run the given executable file with the provided
 parameters.
+
+| Field                 | Type                  | Description |
+| --------------------- | --------------------- | ----------- |
+| `"type"`              | _required_ **string** | `"shellExecute"` |
+| `"executeFile"`       | _required_ **string** | Path to executable to launch. |
+| `"executeParameters"` | _optional_ **string** | Arguments to provide when launching the executable. |
+| `"executeDirectory"`  | _optional_ **string** | Working directory where the executable will be started. |
+
+#### Examples
 
 ```json
 {
@@ -119,7 +138,7 @@ parameters.
             "key": "A",
             "type": "shellExecute",
             "executeFile": "C:\\Windows\\explorer.exe",
-            "executeParameters": "C:\"
+            "executeParameters": "C:\\"
         },
         {
             "name": "VS Code",
@@ -133,11 +152,18 @@ parameters.
 }
 ```
 
-### URI Commands
+### URI Command
 
 These commands launch the given URI using the default protocol handler.
 In addition to launching websites, you can also use these commands to launch
 applications that use protocol activation.
+
+| Field                 | Type                  | Description |
+| --------------------- | --------------------- | ----------- |
+| `"type"`              | _required_ **string** | `"uri"` |
+| `"uri"`               | _required_ **string** | URI to activate. |
+
+#### Examples
 
 ```json
 {
@@ -164,7 +190,7 @@ applications that use protocol activation.
 }
 ```
 
-### AUMID Commands
+### AUMID Command
 
 Packaged apps on Windows can be activated using an "application user model id"
 or AUMID.
@@ -178,6 +204,13 @@ An easy way to find the AUMID for an installed app is to use the
 PowerShell command to find the package family name and installation location,
 then look at the `AppxManifest.xml` in the installation location to determine
 the Application ID you wish to launch.
+
+| Field                 | Type                  | Description |
+| --------------------- | --------------------- | ----------- |
+| `"type"`              | _required_ **string** | `"aumid"` |
+| `"aumid"`             | _required_ **string** | Application User Model ID of the packaged application to activate. |
+
+#### Examples
 
 ```json
 {
@@ -210,9 +243,14 @@ FlashCom stores log files alongside `settings.json` in these locations:
 - **Packaged App:** `%LOCALAPPDATA%\Packages\164HaydenMcAfee.FlashCom_nqvw84mb3bsjc\LocalState\FlashCom.log`
 - **Unpackaged:** `%LOCALAPPDATA%\FlashCom\FlashCom.log`
 
+Also ensure you have the latest
+[Microsoft VC Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version)
+installed.
+
 If you're still running into problems please file an issue and attach your
 `FlashCom.log` file (note that the log file may contain information present in
-your `settings.json`).
+your `settings.json`, remove any information that you don't want revealed before
+posting).
 
 # Third Party Libraries
 
