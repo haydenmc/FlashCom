@@ -20,6 +20,7 @@ namespace
     constexpr std::string_view c_commandTypeJsonProperty{ "type" };
     constexpr std::string_view c_commandExecuteFileJsonProperty{ "executeFile" };
     constexpr std::string_view c_commandExecuteParametersJsonProperty{ "executeParameters" };
+    constexpr std::string_view c_commandExecuteDirectoryJsonProperty{ "executeDirectory" };
     constexpr std::string_view c_commandUriJsonProperty{ "uri" };
     constexpr std::string_view c_commandAumidJsonProperty{ "aumid" };
     // JSON command node 'type' values
@@ -44,14 +45,16 @@ namespace
                     "key": "C",
                     "type": "shellExecute",
                     "executeFile": "calc.exe",
-                    "executeParameters": ""
+                    "executeParameters": "",
+                    "executeDirectory": ""
                 },
                 {
                     "name": "Notepad",
                     "key": "N",
                     "type": "shellExecute",
                     "executeFile": "notepad.exe",
-                    "executeParameters": ""
+                    "executeParameters": "",
+                    "executeDirectory": ""
                 },
                 {
                     "name": "Settings",
@@ -66,7 +69,8 @@ namespace
             "key": "E",
             "type": "shellExecute",
             "executeFile": "msedge.exe",
-            "executeParameters": ""
+            "executeParameters": "",
+            "executeDirectory": ""
         }
     ]
 })" };
@@ -103,6 +107,7 @@ namespace
     {
         std::string executeFile;
         std::string executeParameters;
+        std::string executeDirectory;
         if (!json.contains(c_commandExecuteFileJsonProperty) ||
             !json.at(c_commandExecuteFileJsonProperty).is_string())
         {
@@ -122,11 +127,18 @@ namespace
             executeParameters = json.at(c_commandExecuteParametersJsonProperty).get<std::string>();
         }
 
+        // executeDirectory is optional
+        if (json.contains(c_commandExecuteDirectoryJsonProperty) &&
+            json.at(c_commandExecuteDirectoryJsonProperty).is_string())
+        {
+            executeDirectory = json.at(c_commandExecuteDirectoryJsonProperty).get<std::string>();
+        }
+
         SPDLOG_INFO("::ParseToShellExecuteTreeNode - Creating ShellExecute node {}:{}, "
-            "file: '{}', parameters: '{}'", static_cast<char>(keyCode), name,
-            executeFile, executeParameters);
+            "file: '{}', parameters: '{}', directory: '{}'", static_cast<char>(keyCode), name,
+            executeFile, executeParameters, executeDirectory);
         return std::make_unique<FlashCom::Models::ShellExecuteTreeNode>(keyCode,
-            name, executeFile, executeParameters);
+            name, executeFile, executeParameters, executeDirectory);
     }
 
     std::expected<std::unique_ptr<FlashCom::Models::LaunchUriTreeNode>, std::string>

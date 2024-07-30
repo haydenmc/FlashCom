@@ -105,8 +105,7 @@ parameters.
             "name": "Calculator",
             "key": "C",
             "type": "shellExecute",
-            "executeFile": "calc.exe",
-            "executeParameters": ""
+            "executeFile": "calc.exe"
         },
         {
             "name": "Spotify Web",
@@ -116,11 +115,19 @@ parameters.
             "executeParameters": "--app=\"https://open.spotify.com\""
         },
         {
-            "name": "Absolute Path",
+            "name": "C Drive",
             "key": "A",
             "type": "shellExecute",
             "executeFile": "C:\\Windows\\explorer.exe",
-            "executeParameters": ""
+            "executeParameters": "C:\"
+        },
+        {
+            "name": "VS Code",
+            "key": "A",
+            "type": "shellExecute",
+            "executeFile": "C:\\Users\\Hayden\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+            "executeParameters": "",
+            "executeDirectory": "C:\\Users\\Hayden\\AppData\\Local\\Programs\\Microsoft VS Code"
         }
     ]
 }
