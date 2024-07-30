@@ -43,9 +43,9 @@ For the unpackaged app, `settings.json` is located in `%LOCALAPPDATA%\FlashCom`.
 
 | Name         | "type"           | Description                                |
 | ------------ | ---------------- | ------------------------------------------ |
-| [ShellExecute Command](#shellexecute-commands) | `"shellExecute"` | Launches arbitrary Windows executables. |
-| [URI Command](#uri-commands) | `"uri"` | Activates the given URI with the default protocol handler. |
-| [AUMID Command](#aumid-commands) | `"aumid"` | Activates the Windows Packaged app with the given AUMID. |
+| [ShellExecute Command](#shellexecute-command) | `"shellExecute"` | Launches arbitrary Windows executables. |
+| [URI Command](#uri-command) | `"uri"` | Activates the given URI with the default protocol handler. |
+| [AUMID Command](#aumid-command) | `"aumid"` | Activates the Windows Packaged app with the given AUMID. |
 
 The `"commands"` field defines the set of commands shown in FlashCom:
 
@@ -103,7 +103,7 @@ commands don't have a `"type"` field, but instead have a `"children"` field:
 }
 ```
 
-### ShellExecute Commands
+### ShellExecute Command
 
 These commands simply run the given executable file with the provided
 parameters.
@@ -152,7 +152,7 @@ parameters.
 }
 ```
 
-### URI Commands
+### URI Command
 
 These commands launch the given URI using the default protocol handler.
 In addition to launching websites, you can also use these commands to launch
@@ -190,7 +190,7 @@ applications that use protocol activation.
 }
 ```
 
-### AUMID Commands
+### AUMID Command
 
 Packaged apps on Windows can be activated using an "application user model id"
 or AUMID.
