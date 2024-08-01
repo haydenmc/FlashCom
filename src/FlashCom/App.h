@@ -28,10 +28,12 @@ namespace FlashCom
         View::TrayIcon m_trayIcon;
         View::Ui m_ui;
         std::unordered_set<uint32_t> m_hotkeysPressed;
+        winrt::Windows::System::Threading::ThreadPoolTimer m_hotkeyResetTimer{ nullptr };
         bool m_isShowing{ false };
 
         App(const HINSTANCE& hInstance);
         void HandleFocusLost();
+        void OnHotkeyTimerElapsed(winrt::Windows::System::Threading::ThreadPoolTimer timer);
         void OnKeyDown(uint8_t vkeyCode);
         void OnKeyUp(uint8_t vkeyCode);
         void Show();

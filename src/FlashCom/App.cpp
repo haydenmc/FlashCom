@@ -8,6 +8,7 @@
 namespace
 {
     const std::unordered_set<uint32_t> c_hotkeyCombo{ VK_LWIN, VK_SPACE };
+    constexpr std::chrono::milliseconds c_hotkeyExpirationTime{ 1000 };
 }
 
 namespace FlashCom
@@ -88,28 +89,53 @@ namespace FlashCom
         if (isKeyDown)
         {
             m_hotkeysPressed.insert(kb->vkCode);
+            if (m_hotkeysPressed.size() == c_hotkeyCombo.size())
+            {
+                SPDLOG_INFO("App::HandleLowLevelKeyboardInput - Hotkey pressed");
+                ToggleVisibility();
+
+                // This dummy event is to prevent Start from thinking that the Win key was
+                // just pressed.
+                // See https://github.com/microsoft/PowerToys/pull/4874
+                INPUT dummyEvent[1] = {};
+                dummyEvent[0].type = INPUT_KEYBOARD;
+                dummyEvent[0].ki.wVk = 0xFF;
+                dummyEvent[0].ki.dwFlags = KEYEVENTF_KEYUP;
+                SendInput(1, dummyEvent, sizeof(INPUT));
+
+                // Reset hotkey state to avoid any stuck keys or accidental invocations
+                m_hotkeysPressed.clear();
+
+                // Cancel reset timer
+                if (m_hotkeyResetTimer)
+                {
+                    m_hotkeyResetTimer.Cancel();
+                    m_hotkeyResetTimer = nullptr;
+                }
+
+                return FlashCom::Input::LowLevelCallbackReturnKind::Handled;
+            }
+            else
+            {
+                // Every time a new hotkey key is pressed, (re)set a timer.
+                // Once the timer elapses, reset hotkey key state.
+                // This is to handle situations where key events are "eaten" before they reach us
+                // (ex. User invokes lock with Win+L, lock screen eats the key-up events)
+                // Otherwise keys might get stuck in a "pressed" state.
+                if (m_hotkeyResetTimer)
+                {
+                    m_hotkeyResetTimer.Cancel();
+                }
+                m_hotkeyResetTimer = winrt::WST::ThreadPoolTimer::CreateTimer(
+                    { this, &App::OnHotkeyTimerElapsed }, c_hotkeyExpirationTime);
+            }
         }
         else
         {
             m_hotkeysPressed.erase(kb->vkCode);
         }
 
-        if (m_hotkeysPressed.size() == c_hotkeyCombo.size())
-        {
-            SPDLOG_INFO("App::HandleLowLevelKeyboardInput - Hotkey pressed");
-            ToggleVisibility();
-
-            // This dummy event is to prevent Start from thinking that the Win key was
-            // just pressed.
-            // See https://github.com/microsoft/PowerToys/pull/4874
-            INPUT dummyEvent[1] = {};
-            dummyEvent[0].type = INPUT_KEYBOARD;
-            dummyEvent[0].ki.wVk = 0xFF;
-            dummyEvent[0].ki.dwFlags = KEYEVENTF_KEYUP;
-            SendInput(1, dummyEvent, sizeof(INPUT));
-
-            return FlashCom::Input::LowLevelCallbackReturnKind::Handled;
-        }
+        
         return FlashCom::Input::LowLevelCallbackReturnKind::Unhandled;
     }
 
@@ -144,6 +170,14 @@ namespace FlashCom
         {
             Hide();
         }
+    }
+
+    void App::OnHotkeyTimerElapsed(winrt::WST::ThreadPoolTimer timer)
+    {
+        // See comment in App::HandleLowLevelKeyboardInput
+        SPDLOG_INFO("App::OnHotkeyTimerElapsed - Timer elapsed, clearing hotkey state");
+        m_hotkeysPressed.clear();
+        m_hotkeyResetTimer = nullptr;
     }
 
     void App::OnKeyDown(uint8_t vkeyCode)

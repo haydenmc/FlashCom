@@ -18,6 +18,7 @@
 #include <winrt/Windows.Graphics.Effects.h>
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.System.h>
+#include <winrt/Windows.System.Threading.h>
 #include <winrt/Windows.UI.Composition.h>
 #include <winrt/Windows.UI.Composition.Desktop.h>
 #include <windows.ui.composition.interop.h>
@@ -52,6 +53,7 @@ namespace winrt
     namespace WGDX = Windows::Graphics::DirectX;
     namespace WStorage = Windows::Storage;
     namespace WS = Windows::System;
+    namespace WST = Windows::System::Threading;
     namespace WUI = Windows::UI;
     namespace WUIC = Windows::UI::Composition;
     namespace WUICD = Windows::UI::Composition::Desktop;
