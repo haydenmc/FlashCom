@@ -5,17 +5,40 @@ namespace
 {
     constexpr float c_bufferBetweenKeyAndName{ 64 };
     constexpr float c_bufferBetweenNodes{ 16 };
-
-    winrt::WUIC::ContainerVisual CreateRootVisual(winrt::WUIC::Compositor compositor,
-        winrt::WUIC::ContainerVisual contentsVisual)
+    constexpr std::chrono::milliseconds c_backgroundFadeInAnimationTime{ 250 };
+    constexpr std::chrono::milliseconds c_contentScaleInAnimationTime{ 500 };
+    
+    winrt::WUIC::ScalarKeyFrameAnimation CreateBackgroundFadeInAnimation(
+        winrt::WUIC::Compositor compositor)
     {
-        auto root{ compositor.CreateContainerVisual() };
-        root.RelativeSizeAdjustment({ 1.0f, 1.0f });
-        root.Offset({ 0, 0, 0 });
+        auto animation{ compositor.CreateScalarKeyFrameAnimation() };
+        auto easingFunction{
+            winrt::WUIC::CompositionEasingFunction::CreateCircleEasingFunction(
+                compositor, winrt::WUIC::CompositionEasingFunctionMode::Out) };
+        animation.InsertKeyFrame(0.0f, 0.0f, easingFunction);
+        animation.InsertKeyFrame(1.0f, 1.0f, easingFunction);
+        animation.Duration(c_backgroundFadeInAnimationTime);
+        return animation;
+    }
 
+    winrt::WUIC::Vector3KeyFrameAnimation CreateContentScaleInAnimation(
+        winrt::WUIC::Compositor compositor)
+    {
+        auto animation{ compositor.CreateVector3KeyFrameAnimation() };
+        auto easingFunction{
+            winrt::WUIC::CompositionEasingFunction::CreatePowerEasingFunction(
+                compositor, winrt::WUIC::CompositionEasingFunctionMode::Out, 5) };
+        animation.InsertKeyFrame(0.0f, { 0.8f, 0.8f, 0.8f }, easingFunction);
+        animation.InsertKeyFrame(1.0f, { 1.0f, 1.0f, 1.0f }, easingFunction);
+        animation.Duration(c_contentScaleInAnimationTime);
+        return animation;
+    }
+
+    winrt::WUIC::ContainerVisual CreateBackgroundVisual(winrt::WUIC::Compositor compositor)
+    {
         // Create background
         // TODO: Allow this to be customized.
-        winrt::Windows::UI::Color bgColor{ 255, 128, 128, 128 };
+        winrt::Windows::UI::Color bgColor{ 192, 128, 128, 128 };
         winrt::MGCE::ColorSourceEffect bgColorEffect{};
         bgColorEffect.Color(bgColor);
         winrt::MGCE::BlendEffect blendEffect{};
@@ -31,16 +54,32 @@ namespace
         };
         auto backdropBrush{ compositor.CreateBackdropBrush() };
         blendBrush.SetSourceParameter(L"source", backdropBrush);
-        auto backgroundVisual{ compositor.CreateSpriteVisual() };
+        auto backgroundVisual = compositor.CreateSpriteVisual();
         backgroundVisual.Brush(blendBrush);
         backgroundVisual.RelativeSizeAdjustment({ 1, 1 });
         backgroundVisual.AnchorPoint({ 0.5, 0.5 });
         backgroundVisual.RelativeOffsetAdjustment({ 0.5, 0.5, 0 });
+
+        return backgroundVisual;
+    }
+
+    winrt::WUIC::ContainerVisual CreateContentsVisual(winrt::WUIC::Compositor compositor)
+    {
+        auto visual{ compositor.CreateContainerVisual() };
+        visual.RelativeSizeAdjustment({ 1.0f, 1.0f });
+        visual.AnchorPoint({ 0.5f, 0.5f });
+        visual.RelativeOffsetAdjustment({ 0.5, 0.5, 0 });
+        return visual;
+    }
+
+    winrt::WUIC::ContainerVisual CreateRootVisual(winrt::WUIC::Compositor compositor,
+        winrt::WUIC::ContainerVisual backgroundVisual, winrt::WUIC::ContainerVisual contentsVisual)
+    {
+        auto root{ compositor.CreateContainerVisual() };
+        root.RelativeSizeAdjustment({ 1.0f, 1.0f });
+        root.Offset({ 0, 0, 0 });
         root.Children().InsertAtBottom(backgroundVisual);
-
-        // Add contents
         root.Children().InsertAtTop(contentsVisual);
-
         return root;
     }
 
@@ -84,8 +123,14 @@ namespace FlashCom::View
         m_hostWindow{ hostWindow },
         m_dataModel{ dataModel },
         m_compositionManager{ hostWindow },
-        m_contentsVisual{ m_compositionManager.GetCompositor().CreateContainerVisual() },
-        m_rootVisual{ CreateRootVisual(m_compositionManager.GetCompositor(), m_contentsVisual) }
+        m_backgroundVisual{ CreateBackgroundVisual(m_compositionManager.GetCompositor()) },
+        m_contentsVisual{ CreateContentsVisual(m_compositionManager.GetCompositor()) },
+        m_rootVisual{ CreateRootVisual(m_compositionManager.GetCompositor(), m_backgroundVisual,
+            m_contentsVisual) },
+        m_backgroundFadeInAnimation{
+            CreateBackgroundFadeInAnimation(m_compositionManager.GetCompositor()) },
+        m_contentScaleInAnimation{ CreateContentScaleInAnimation(
+            m_compositionManager.GetCompositor()) }
     {
         m_compositionManager.PresentRootVisual(m_rootVisual);
     }
@@ -107,7 +152,7 @@ namespace FlashCom::View
         m_hostWindow.Hide();
     }
 
-    void Ui::Update(UpdateReasonKind /*reason*/)
+    void Ui::Update(UpdateReasonKind reason)
     {
         // Right now, we do a full re-population of visuals on every update.
         // In the future maybe we can diff and such.
@@ -157,6 +202,14 @@ namespace FlashCom::View
                 nodeYOffset, 0 });
             m_contentsVisual.Children().InsertAtTop(keyVisual);
             m_contentsVisual.Children().InsertAtTop(textVisual);
+        }
+
+        // If we're showing, prepare to animate in
+        if (reason == UpdateReasonKind::Showing)
+        {
+            m_backgroundVisual.StartAnimation(L"opacity", m_backgroundFadeInAnimation);
+            m_contentsVisual.StartAnimation(L"opacity", m_backgroundFadeInAnimation);
+            m_contentsVisual.StartAnimation(L"scale", m_contentScaleInAnimation);
         }
     }
 #pragma endregion Public

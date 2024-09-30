@@ -26,7 +26,13 @@ namespace FlashCom::View
         Models::DataModel const * const m_dataModel;
         CompositionManager m_compositionManager;
         std::pair<uint32_t, uint32_t> m_uiBounds;
+        winrt::Windows::UI::Composition::ContainerVisual m_backgroundVisual{ nullptr };
         winrt::Windows::UI::Composition::ContainerVisual m_contentsVisual{ nullptr };
         winrt::Windows::UI::Composition::ContainerVisual m_rootVisual{ nullptr };
+        // Animations
+        winrt::Windows::UI::Composition::ScalarKeyFrameAnimation
+            m_backgroundFadeInAnimation{ nullptr };
+        winrt::Windows::UI::Composition::Vector3KeyFrameAnimation
+            m_contentScaleInAnimation{ nullptr };
     };
 }
