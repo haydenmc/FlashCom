@@ -83,6 +83,14 @@ namespace
         return root;
     }
 
+    winrt::WUIC::ContainerVisual CreateClockContainer(winrt::WUIC::Compositor compositor)
+    {
+        auto clockContainer{ compositor.CreateContainerVisual() };
+        clockContainer.RelativeSizeAdjustment({ 1.0f, 1.0f });
+        clockContainer.Offset({ 0, 0, 0 });
+        return clockContainer;
+    }
+
     winrt::WUIC::SpriteVisual CreateTextVisual(
         FlashCom::View::CompositionManager& compositionManager,
         winrt::MGCT::CanvasTextFormat textFormat, std::string_view content)
@@ -127,6 +135,7 @@ namespace FlashCom::View
         m_contentsVisual{ CreateContentsVisual(m_compositionManager.GetCompositor()) },
         m_rootVisual{ CreateRootVisual(m_compositionManager.GetCompositor(), m_backgroundVisual,
             m_contentsVisual) },
+        m_clockVisual{ CreateClockContainer(m_compositionManager.GetCompositor()) },
         m_backgroundFadeInAnimation{
             CreateBackgroundFadeInAnimation(m_compositionManager.GetCompositor()) },
         m_contentScaleInAnimation{ CreateContentScaleInAnimation(
@@ -204,6 +213,10 @@ namespace FlashCom::View
             m_contentsVisual.Children().InsertAtTop(textVisual);
         }
 
+        // Clock visual
+        UpdateClockVisual();
+        m_contentsVisual.Children().InsertAtTop(m_clockVisual);
+
         // If we're showing, prepare to animate in
         if (reason == UpdateReasonKind::Showing)
         {
@@ -211,6 +224,50 @@ namespace FlashCom::View
             m_contentsVisual.StartAnimation(L"opacity", m_backgroundFadeInAnimation);
             m_contentsVisual.StartAnimation(L"scale", m_contentScaleInAnimation);
         }
+    }
+
+    void Ui::UpdateClockVisual()
+    {
+        static auto const locale{ std::locale("") };
+        auto const time = std::chrono::current_zone()
+            ->to_local(std::chrono::system_clock::now());
+
+        std::string timeText;
+        if (m_dataModel->UseTwentyFourHourClock)
+        {
+            timeText = std::format(locale, "{0:%H}:{0:%M}", time);
+        }
+        else
+        {
+            timeText = std::format(locale, "{0:%I}:{0:%M}", time);
+        }
+
+        winrt::MGCT::CanvasTextFormat timeTextFormat;
+        timeTextFormat.FontFamily(L"Segoe UI");
+        timeTextFormat.FontSize(128);
+        timeTextFormat.FontWeight(winrt::WUIT::FontWeights::Bold());
+        timeTextFormat.HorizontalAlignment(winrt::MGCT::CanvasHorizontalAlignment::Left);
+        auto timeVisual{ CreateTextVisual(m_compositionManager, timeTextFormat, timeText) };
+        timeVisual.AnchorPoint({0.0f, 1.0f}); 
+        timeVisual.RelativeOffsetAdjustment({0.0f, 1.0f, 0.0f}); 
+
+        auto dateText{ std::format(locale, "{:%x}", time) };
+        winrt::MGCT::CanvasTextFormat dateTextFormat;
+        dateTextFormat.FontFamily(L"Segoe UI");
+        dateTextFormat.FontSize(32);
+        dateTextFormat.FontWeight(winrt::WUIT::FontWeights::Light());
+        dateTextFormat.HorizontalAlignment(winrt::MGCT::CanvasHorizontalAlignment::Left);
+        auto dateVisual{ CreateTextVisual(m_compositionManager, dateTextFormat, dateText) };
+        dateVisual.AnchorPoint({ 0.0f, 1.0f });
+        dateVisual.RelativeOffsetAdjustment({ 0.0f, 1.0f, 0.0f });
+        // HACK: Until we get text layouts fixed, bump the y position up a
+        // little bit to line it up with the time
+        dateVisual.Offset({ (timeVisual.Size().x + 4.0f), -24.0f, 0.0f });
+        
+        m_clockVisual.Children().RemoveAll();
+        m_clockVisual.Children().InsertAtTop(timeVisual);
+        m_clockVisual.Children().InsertAtTop(dateVisual);
+
     }
 #pragma endregion Public
 }

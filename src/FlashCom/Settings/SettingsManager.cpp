@@ -14,6 +14,7 @@ namespace
     constexpr std::string_view c_settingsFileName{ "settings.json" };
     // JSON property names
     constexpr std::string_view c_showStartupNotificationProperty{ "showStartupNotification" };
+    constexpr std::string_view c_useTwentyFourHourClockProperty{ "use24HourClock" };
     constexpr std::string_view c_commandsJsonProperty{ "commands" };
     constexpr std::string_view c_commandNameJsonProperty{ "name" };
     constexpr std::string_view c_commandKeyJsonProperty{ "key" };
@@ -31,6 +32,7 @@ namespace
     // Default settings.json contents
     constexpr std::string_view c_defaultSettingsFileContents{ R"({
     "showStartupNotification": true,
+    "use24HourClock": true,
     "commands": [
         {
             "name": "README",
@@ -369,6 +371,11 @@ namespace FlashCom::Settings
         return m_showStartupNotification;
     }
 
+    bool SettingsManager::UseTwentyFourHourClock()
+    {
+        return m_useTwentyFourHourClock;
+    }
+
     std::shared_ptr<Models::TreeNode> SettingsManager::GetCommandTreeRoot()
     {
         std::shared_lock settingsLock{ m_settingsAccessMutex };
@@ -392,6 +399,19 @@ namespace FlashCom::Settings
             SPDLOG_INFO("SettingsManager::PopulateSettingsValues - No '{}' bool property found. "
                 "Defaulting to '{}'.", c_showStartupNotificationProperty,
                 m_showStartupNotification);
+        }
+
+        if (settingsJson.contains(c_useTwentyFourHourClockProperty) &&
+            settingsJson.at(c_useTwentyFourHourClockProperty).is_boolean())
+        {
+            m_useTwentyFourHourClock =
+                settingsJson.at(c_useTwentyFourHourClockProperty).get<bool>();
+        }
+        else
+        {
+            SPDLOG_INFO("SettingsManager::PopulateSettingsValues - No '{}' bool property found. "
+                "Defaulting to '{}'.", c_useTwentyFourHourClockProperty,
+                m_useTwentyFourHourClock);
         }
     }
 

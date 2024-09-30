@@ -44,6 +44,7 @@ The following fields can be set in the `settings.json` root object:
 | Name                        | Type                     | Description                                |
 | --------------------------- | ------------------------ | ------------------------------------------ |
 | `"showStartupNotification"` | `true` / `false`         | Determines whether the "FlashCom is running" toast notification is shown on startup. |
+| `"use24HourClock"`          | `true` / `false`         | Determines whether a 12-hour or 24-hour clock is shown. |
 | `"commands"`                | Array of Command Objects | The set of commands shown in FlashCom.     |
 
 ## Commands
