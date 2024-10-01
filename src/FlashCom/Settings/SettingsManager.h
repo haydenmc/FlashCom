@@ -13,13 +13,18 @@ namespace FlashCom::Settings
         SettingsManager();
         std::expected<void, std::string> LoadSettings();
         std::filesystem::path GetSettingsFilePath();
+        bool GetShowStartupNotification();
         std::shared_ptr<Models::TreeNode> GetCommandTreeRoot();
 
     private:
         std::filesystem::path const m_settingsFilePath;
         std::shared_mutex m_settingsAccessMutex;
+        bool m_showStartupNotification{ true };
         std::shared_ptr<Models::TreeNode> m_commandTreeRoot;
 
+        void PopulateSettingsValues(
+            const std::unique_lock<std::shared_mutex>& accessLock,
+            const nlohmann::json& settingsJson);
         std::expected<void, std::string> PopulateCommandTree(
             const std::unique_lock<std::shared_mutex>& accessLock,
             const nlohmann::json& settingsJson);

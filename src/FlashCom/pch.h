@@ -13,6 +13,7 @@
 #include <winrt/Microsoft.Graphics.Canvas.Geometry.h>
 #include <winrt/Microsoft.Graphics.Canvas.Text.h>
 #include <winrt/Microsoft.Graphics.Canvas.UI.Composition.h>
+#include <winrt/Windows.Data.Xml.Dom.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Graphics.DirectX.h>
 #include <winrt/Windows.Graphics.Effects.h>
@@ -22,6 +23,7 @@
 #include <winrt/Windows.UI.Composition.h>
 #include <winrt/Windows.UI.Composition.Desktop.h>
 #include <windows.ui.composition.interop.h>
+#include <winrt/Windows.UI.Notifications.h>
 #include <winrt/Windows.UI.Text.h>
 
 // WIL
@@ -49,6 +51,7 @@ namespace winrt
     namespace MGCG = Microsoft::Graphics::Canvas::Geometry;
     namespace MGCT = Microsoft::Graphics::Canvas::Text;
     namespace MGCUC = Microsoft::Graphics::Canvas::UI::Composition;
+    namespace WDXD = Windows::Data::Xml::Dom;
     namespace WF = Windows::Foundation;
     namespace WGDX = Windows::Graphics::DirectX;
     namespace WStorage = Windows::Storage;
@@ -57,5 +60,6 @@ namespace winrt
     namespace WUI = Windows::UI;
     namespace WUIC = Windows::UI::Composition;
     namespace WUICD = Windows::UI::Composition::Desktop;
+    namespace WUIN = Windows::UI::Notifications;
     namespace WUIT = Windows::UI::Text;
 }

@@ -40,22 +40,18 @@ namespace
     }
 }
 
-// Console entrypoint
-int main(
-    int /*argc*/,
-    wchar_t* /*argv*/[]
-)
-{
-    return Run(GetModuleHandleW(nullptr));
-}
-
 // Windows entrypoint
 int WINAPI wWinMain(
     HINSTANCE hInstance,
     HINSTANCE /*hPrevInstance*/,
-    LPWSTR /*lpCmdLine*/,
+    LPWSTR lpCmdLine,
     int /*nCmdShow*/
 )
 {
+    // Ignore launches that were triggered from the startup notification toast
+    if ((std::wstring{ L"-from-startup-toast" }.compare(lpCmdLine) == 0))
+    {
+        return 0;
+    }
     return Run(hInstance);
 }

@@ -13,6 +13,7 @@ namespace
     constexpr std::string_view c_appDataLocalDirectoryName{ "FlashCom" };
     constexpr std::string_view c_settingsFileName{ "settings.json" };
     // JSON property names
+    constexpr std::string_view c_showStartupNotificationProperty{ "showStartupNotification" };
     constexpr std::string_view c_commandsJsonProperty{ "commands" };
     constexpr std::string_view c_commandNameJsonProperty{ "name" };
     constexpr std::string_view c_commandKeyJsonProperty{ "key" };
@@ -29,6 +30,7 @@ namespace
     constexpr std::string_view c_commandTypeValueAumid{ "aumid" };
     // Default settings.json contents
     constexpr std::string_view c_defaultSettingsFileContents{ R"({
+    "showStartupNotification": true,
     "commands": [
         {
             "name": "README",
@@ -351,7 +353,7 @@ namespace FlashCom::Settings
             return std::unexpected(std::format("Could not parse settings.json file: {}",
                 e.what()));
         }
-
+        PopulateSettingsValues(settingsLock, settingsJson);
         PopulateCommandTree(settingsLock, settingsJson);
         return {}; // Spurious warning C4715
     }
@@ -362,10 +364,35 @@ namespace FlashCom::Settings
         return m_settingsFilePath;
     }
 
+    bool SettingsManager::GetShowStartupNotification()
+    {
+        return m_showStartupNotification;
+    }
+
     std::shared_ptr<Models::TreeNode> SettingsManager::GetCommandTreeRoot()
     {
         std::shared_lock settingsLock{ m_settingsAccessMutex };
         return m_commandTreeRoot;
+    }
+
+    void SettingsManager::PopulateSettingsValues(
+        const std::unique_lock<std::shared_mutex>& /*accessLock*/,
+        const nlohmann::json& settingsJson)
+    {
+        SPDLOG_INFO("SettingsManager::PopulateSettingsValues");
+
+        if (settingsJson.contains(c_showStartupNotificationProperty) &&
+            settingsJson.at(c_showStartupNotificationProperty).is_boolean())
+        {
+            m_showStartupNotification =
+                settingsJson.at(c_showStartupNotificationProperty).get<bool>();
+        }
+        else
+        {
+            SPDLOG_INFO("SettingsManager::PopulateSettingsValues - No '{}' bool property found. "
+                "Defaulting to '{}'.", c_showStartupNotificationProperty,
+                m_showStartupNotification);
+        }
     }
 
     std::expected<void, std::string> SettingsManager::PopulateCommandTree(
