@@ -9,6 +9,26 @@ namespace
 {
     const std::unordered_set<uint32_t> c_hotkeyCombo{ VK_LWIN, VK_SPACE };
     constexpr std::chrono::milliseconds c_hotkeyExpirationTime{ 1000 };
+
+    void ShowStartupNotification()
+    {
+        winrt::WDXD::XmlDocument notificationPayload;
+        notificationPayload.LoadXml(LR""""(
+<toast launch="-from-startup-toast">
+    <visual>
+        <binding template="ToastGeneric">
+            <text>FlashCom is running!</text>
+            <text>Press Win+Space to invoke.</text>
+            <text>Manage settings from the system tray icon.</text>
+        </binding>
+    </visual>
+</toast>
+)"""");
+        winrt::WUIN::ToastNotification notification{ notificationPayload };
+        auto notificationManager{ winrt::WUIN::ToastNotificationManager::GetDefault() };
+        auto notifier{ notificationManager.CreateToastNotifier() };
+        notifier.Show(notification);
+    }
 }
 
 namespace FlashCom
@@ -24,6 +44,7 @@ namespace FlashCom
     void App::LoadDataModel()
     {
         auto result{ m_settingsManager.LoadSettings() };
+        m_dataModel->ShowStartupNotification = m_settingsManager.GetShowStartupNotification();
         m_dataModel->RootNode = m_settingsManager.GetCommandTreeRoot();
         m_dataModel->CurrentNode = m_dataModel->RootNode.get();
         if (!result.has_value())
@@ -38,6 +59,15 @@ namespace FlashCom
 
     int App::RunMessageLoop()
     {
+        // On launch, notify the user that we are, in fact, running.
+        // FlashCom has failed Windows Store certification in the past because
+        // the tester thought the app didn't start successfully.
+        if (m_dataModel->ShowStartupNotification)
+        {
+            SPDLOG_INFO("App::RunMessageLoop - Showing startup notification");
+            ShowStartupNotification();
+        }
+
         MSG msg;
         while (GetMessage(&msg, nullptr, 0, 0))
         {

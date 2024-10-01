@@ -39,6 +39,13 @@ For the packaged app, `settings.json` is located in `%LOCALAPPDATA%\Packages\164
 
 For the unpackaged app, `settings.json` is located in `%LOCALAPPDATA%\FlashCom`.
 
+The following fields can be set in the `settings.json` root object:
+
+| Name                        | Type                     | Description                                |
+| --------------------------- | ------------------------ | ------------------------------------------ |
+| `"showStartupNotification"` | `true` / `false`         | Determines whether the "FlashCom is running" toast notification is shown on startup. |
+| `"commands"`                | Array of Command Objects | The set of commands shown in FlashCom.     |
+
 ## Commands
 
 | Name         | "type"           | Description                                |
