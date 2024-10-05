@@ -45,6 +45,7 @@ namespace FlashCom
     {
         auto result{ m_settingsManager.LoadSettings() };
         m_dataModel->ShowStartupNotification = m_settingsManager.GetShowStartupNotification();
+        m_dataModel->UseTwentyFourHourClock = m_settingsManager.UseTwentyFourHourClock();
         m_dataModel->RootNode = m_settingsManager.GetCommandTreeRoot();
         m_dataModel->CurrentNode = m_dataModel->RootNode.get();
         if (!result.has_value())

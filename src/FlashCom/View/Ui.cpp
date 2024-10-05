@@ -83,6 +83,14 @@ namespace
         return root;
     }
 
+    winrt::WUIC::ContainerVisual CreateClockContainer(winrt::WUIC::Compositor compositor)
+    {
+        auto clockContainer{ compositor.CreateContainerVisual() };
+        clockContainer.RelativeSizeAdjustment({ 1.0f, 1.0f });
+        clockContainer.Offset({ 0, 0, 0 });
+        return clockContainer;
+    }
+
     winrt::WUIC::SpriteVisual CreateTextVisual(
         FlashCom::View::CompositionManager& compositionManager,
         winrt::MGCT::CanvasTextFormat textFormat, std::string_view content)
@@ -113,6 +121,17 @@ namespace
 
         return spriteVisual;
     }
+
+    std::chrono::milliseconds TimeToNextMinute()
+    {
+        auto const time = std::chrono::current_zone()
+            ->to_local(std::chrono::system_clock::now());
+        auto minutes = std::chrono::floor<std::chrono::minutes>(time);
+        auto ms = std::chrono::floor<std::chrono::milliseconds>(time);
+        auto untilNextMinute = std::chrono::floor<std::chrono::milliseconds>(
+            std::chrono::minutes{ 1 } - (ms - minutes));
+        return untilNextMinute;
+    }
 }
 
 namespace FlashCom::View
@@ -127,6 +146,7 @@ namespace FlashCom::View
         m_contentsVisual{ CreateContentsVisual(m_compositionManager.GetCompositor()) },
         m_rootVisual{ CreateRootVisual(m_compositionManager.GetCompositor(), m_backgroundVisual,
             m_contentsVisual) },
+        m_clockVisual{ CreateClockContainer(m_compositionManager.GetCompositor()) },
         m_backgroundFadeInAnimation{
             CreateBackgroundFadeInAnimation(m_compositionManager.GetCompositor()) },
         m_contentScaleInAnimation{ CreateContentScaleInAnimation(
@@ -150,6 +170,12 @@ namespace FlashCom::View
     void Ui::Hide()
     {
         m_hostWindow.Hide();
+        if (m_clockUpdateTimer)
+        {
+            SPDLOG_INFO("Ui::Hide - Canceling clock timer");
+            m_clockUpdateTimer.Cancel();
+            m_clockUpdateTimer = nullptr;
+        }
     }
 
     void Ui::Update(UpdateReasonKind reason)
@@ -204,13 +230,90 @@ namespace FlashCom::View
             m_contentsVisual.Children().InsertAtTop(textVisual);
         }
 
+        // Clock visual
+        UpdateClockVisual();
+        m_contentsVisual.Children().InsertAtTop(m_clockVisual);
+
         // If we're showing, prepare to animate in
         if (reason == UpdateReasonKind::Showing)
         {
             m_backgroundVisual.StartAnimation(L"opacity", m_backgroundFadeInAnimation);
             m_contentsVisual.StartAnimation(L"opacity", m_backgroundFadeInAnimation);
             m_contentsVisual.StartAnimation(L"scale", m_contentScaleInAnimation);
+
+            if (m_clockUpdateTimer)
+            {
+                m_clockUpdateTimer.Cancel();
+                m_clockUpdateTimer = nullptr;
+            }
+            auto nextUpdate{ TimeToNextMinute() };
+            SPDLOG_INFO("Ui::Update - setting clock timer for {}ms", nextUpdate.count());
+            m_clockUpdateTimer = winrt::WST::ThreadPoolTimer::CreateTimer(
+                { this, &Ui::OnClockUpdateTimerElapsed }, nextUpdate);
         }
+    }
+
+    void Ui::UpdateClockVisual()
+    {
+        static auto const locale{ std::locale("") };
+        auto const time = std::chrono::current_zone()
+            ->to_local(std::chrono::system_clock::now());
+        auto days = std::chrono::floor<std::chrono::days>(time);
+        std::chrono::hh_mm_ss hhmmss{ std::chrono::floor<std::chrono::milliseconds>(time - days) };
+        std::string timeText;
+
+        if (m_dataModel->UseTwentyFourHourClock)
+        {
+            timeText = std::format(locale, "{:0>2}:{:0>2}", hhmmss.hours().count(),
+                hhmmss.minutes().count());
+        }
+        else
+        {
+            timeText = std::format(locale, "{}:{:0>2}", hhmmss.hours().count() % 12,
+                hhmmss.minutes().count());
+        }
+
+        winrt::MGCT::CanvasTextFormat timeTextFormat;
+        timeTextFormat.FontFamily(L"Segoe UI");
+        timeTextFormat.FontSize(128);
+        timeTextFormat.FontWeight(winrt::WUIT::FontWeights::Bold());
+        timeTextFormat.HorizontalAlignment(winrt::MGCT::CanvasHorizontalAlignment::Left);
+        auto timeVisual{ CreateTextVisual(m_compositionManager, timeTextFormat, timeText) };
+        timeVisual.AnchorPoint({ 0.0f, 0.0f });
+        timeVisual.RelativeOffsetAdjustment({ 0.0f, 0.0f, 0.0f });
+        timeVisual.Offset({ 28.0f, 0.0f, 0.0f });
+
+        auto dateText{ std::format(locale, "{:%x}", time) };
+        winrt::MGCT::CanvasTextFormat dateTextFormat;
+        dateTextFormat.FontFamily(L"Segoe UI");
+        dateTextFormat.FontSize(48);
+        dateTextFormat.FontWeight(winrt::WUIT::FontWeights::Light());
+        dateTextFormat.HorizontalAlignment(winrt::MGCT::CanvasHorizontalAlignment::Left);
+        auto dateVisual{ CreateTextVisual(m_compositionManager, dateTextFormat, dateText) };
+        dateVisual.AnchorPoint({ 0.0f, 0.0f });
+        dateVisual.RelativeOffsetAdjustment({ 0.0f, 0.0f, 0.0f });
+        dateVisual.Offset({ 32.0f, (timeVisual.Size().y - 24.0f), 0.0f });
+        
+        m_clockVisual.Children().RemoveAll();
+        m_clockVisual.Children().InsertAtTop(timeVisual);
+        m_clockVisual.Children().InsertAtTop(dateVisual);
+
+    }
+
+    void Ui::OnClockUpdateTimerElapsed(winrt::WST::ThreadPoolTimer /*timer*/)
+    {
+        auto nextUpdate{ TimeToNextMinute() };
+        SPDLOG_INFO(
+            "Ui::OnClockUpdateTimerElapsed - Updating clock visual and resetting timer to {}ms",
+            nextUpdate.count());
+        UpdateClockVisual();
+        if (m_clockUpdateTimer)
+        {
+            m_clockUpdateTimer.Cancel();
+            m_clockUpdateTimer = nullptr;
+        }
+        m_clockUpdateTimer = winrt::WST::ThreadPoolTimer::CreateTimer(
+            { this, &Ui::OnClockUpdateTimerElapsed }, nextUpdate);
     }
 #pragma endregion Public
 }

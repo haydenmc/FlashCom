@@ -7,6 +7,7 @@ namespace FlashCom::Models
     {
         std::string LoadErrorMessage;
         bool ShowStartupNotification;
+        bool UseTwentyFourHourClock;
         std::shared_ptr<TreeNode> RootNode;
         TreeNode* CurrentNode{ nullptr };
     };
