@@ -9,7 +9,7 @@
   <Identity
     Name="164HaydenMcAfee.FlashCom"
     Publisher="CN=5061D826-8E2A-4755-932E-A6DD607C027B"
-    Version="0.3.1.0" />
+    Version="0.4.0.0" />
 
   <Properties>
     <DisplayName>FlashCom</DisplayName>
