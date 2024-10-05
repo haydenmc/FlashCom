@@ -51,11 +51,11 @@ namespace
         LONG extendedStyles{ GetWindowLongW(hWnd, GWL_EXSTYLE) };
         LONG newStyles
         {
+            // See https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features/
+            // and https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles
             extendedStyles |
-            WS_EX_LAYERED |    // https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features
             WS_EX_TOOLWINDOW | // Don't show in taskbar/switcher
-            WS_EX_TOPMOST |    // Always on top
-            WS_EX_TRANSPARENT  // Make layered window clickthrough
+            WS_EX_TOPMOST      // Always on top
         };
         SetWindowLongW(hWnd, GWL_EXSTYLE, newStyles);
 
