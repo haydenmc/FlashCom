@@ -21,7 +21,7 @@ namespace FlashCom::Settings
         std::filesystem::path const m_settingsFilePath;
         std::shared_mutex m_settingsAccessMutex;
         bool m_showStartupNotification{ true };
-        bool m_useTwentyFourHourClock{ true };
+        bool m_useTwentyFourHourClock{ false };
         std::shared_ptr<Models::TreeNode> m_commandTreeRoot;
 
         void PopulateSettingsValues(

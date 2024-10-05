@@ -23,6 +23,7 @@ namespace FlashCom::View
 
     private:
         void UpdateClockVisual();
+        void OnClockUpdateTimerElapsed(winrt::Windows::System::Threading::ThreadPoolTimer timer);
 
         HostWindow& m_hostWindow;
         Models::DataModel const * const m_dataModel;
@@ -39,5 +40,7 @@ namespace FlashCom::View
             m_backgroundFadeInAnimation{ nullptr };
         winrt::Windows::UI::Composition::Vector3KeyFrameAnimation
             m_contentScaleInAnimation{ nullptr };
+        // Misc
+        winrt::Windows::System::Threading::ThreadPoolTimer m_clockUpdateTimer{ nullptr };
     };
 }

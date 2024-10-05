@@ -32,7 +32,7 @@ namespace
     // Default settings.json contents
     constexpr std::string_view c_defaultSettingsFileContents{ R"({
     "showStartupNotification": true,
-    "use24HourClock": true,
+    "use24HourClock": false,
     "commands": [
         {
             "name": "README",
