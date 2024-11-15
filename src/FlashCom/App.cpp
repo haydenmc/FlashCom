@@ -12,22 +12,39 @@ namespace
 
     void ShowStartupNotification()
     {
-        winrt::WDXD::XmlDocument notificationPayload;
-        notificationPayload.LoadXml(LR""""(
-<toast launch="-from-startup-toast">
-    <visual>
-        <binding template="ToastGeneric">
-            <text>FlashCom is running!</text>
-            <text>Press Win+Space to invoke.</text>
-            <text>Manage settings from the system tray icon.</text>
-        </binding>
-    </visual>
-</toast>
-)"""");
-        winrt::WUIN::ToastNotification notification{ notificationPayload };
-        auto notificationManager{ winrt::WUIN::ToastNotificationManager::GetDefault() };
-        auto notifier{ notificationManager.CreateToastNotifier() };
-        notifier.Show(notification);
+        try
+        {
+            winrt::WDXD::XmlDocument notificationPayload;
+            notificationPayload.LoadXml(LR""""(
+    <toast launch="-from-startup-toast">
+        <visual>
+            <binding template="ToastGeneric">
+                <text>FlashCom is running!</text>
+                <text>Press Win+Space to invoke.</text>
+                <text>Manage settings from the system tray icon.</text>
+            </binding>
+        </visual>
+    </toast>
+    )"""");
+            winrt::WUIN::ToastNotification notification{ notificationPayload };
+            auto notificationManager{ winrt::WUIN::ToastNotificationManager::GetDefault() };
+            auto notifier{ notificationManager.CreateToastNotifier() };
+            notifier.Show(notification);
+        }
+        catch (const winrt::hresult_error& error)
+        {
+            // Currently, we can't fire toasts from an unpacked app.
+            // See issue at github.com/haydenmc/FlashCom/issues/37
+            if (error.code() != 0x80070490) // ERROR_NOT_FOUND
+            {
+                throw error;
+            }
+            else
+            {
+                SPDLOG_WARN("App::ShowStartupNotification - Cannot fire toast "
+                    "notification from unpackaged app.");
+            }
+        }
     }
 }
 
