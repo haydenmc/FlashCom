@@ -6,17 +6,16 @@ namespace FlashCom::View
 {
     enum class UpdateReasonKind
     {
-        Reloading,
+        Layout,
         Showing,
         Hiding,
-        Navigating,
+        Navigate,
     };
 
     class Ui
     {
     public:
-        Ui(HostWindow& hostWindow,
-            Models::DataModel const * const dataModel);
+        Ui(HostWindow& hostWindow, Models::DataModel const * const dataModel);
         void Show();
         void Hide();
         void Update(UpdateReasonKind reason);
@@ -33,6 +32,8 @@ namespace FlashCom::View
         winrt::Windows::UI::Composition::ContainerVisual m_backgroundVisual{ nullptr };
         winrt::Windows::UI::Composition::ContainerVisual m_contentsVisual{ nullptr };
         winrt::Windows::UI::Composition::ContainerVisual m_rootVisual{ nullptr };
+        // UI Components
+        
         // Element visuals
         winrt::Windows::UI::Composition::ContainerVisual m_clockVisual{ nullptr };
         // Animations

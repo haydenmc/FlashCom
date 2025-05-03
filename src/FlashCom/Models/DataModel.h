@@ -1,5 +1,6 @@
 #pragma once
 #include "TreeNode.h"
+#include <stack>
 
 namespace FlashCom::Models
 {
@@ -9,6 +10,22 @@ namespace FlashCom::Models
         bool ShowStartupNotification;
         bool UseTwentyFourHourClock;
         std::shared_ptr<TreeNode> RootNode;
-        TreeNode* CurrentNode{ nullptr };
+        std::stack<TreeNode*> CurrentNodeStack;
+
+        void ResetCurrentNode()
+        {
+            std::stack<TreeNode*> newStack;
+            newStack.push(RootNode.get());
+            CurrentNodeStack.swap(newStack);
+        }
+
+        const std::vector<TreeNode*> CurrentNodeChildren() const
+        {
+            if (CurrentNodeStack.empty())
+            {
+                return {};
+            }
+            return CurrentNodeStack.top()->GetChildren();
+        }
     };
 }

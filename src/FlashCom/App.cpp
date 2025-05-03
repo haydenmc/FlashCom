@@ -64,7 +64,7 @@ namespace FlashCom
         m_dataModel->ShowStartupNotification = m_settingsManager.GetShowStartupNotification();
         m_dataModel->UseTwentyFourHourClock = m_settingsManager.UseTwentyFourHourClock();
         m_dataModel->RootNode = m_settingsManager.GetCommandTreeRoot();
-        m_dataModel->CurrentNode = m_dataModel->RootNode.get();
+        m_dataModel->CurrentNodeStack.push(m_dataModel->RootNode.get());
         if (!result.has_value())
         {
             m_dataModel->LoadErrorMessage = result.error();
@@ -236,14 +236,14 @@ namespace FlashCom
             Hide();
             return;
         }
-        for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
+        for (const auto& childNode : m_dataModel->CurrentNodeChildren())
         {
             if (childNode->GetVkCode() == vkeyCode)
             {
                 if (childNode->GetChildren().size() > 0)
                 {
                     SPDLOG_INFO("App::OnKeyDown - Navigating to {}", childNode->GetName());
-                    m_dataModel->CurrentNode = childNode;
+                    m_dataModel->CurrentNodeStack.push(childNode);
                     m_ui.Update(View::UpdateReasonKind::Navigating);
                 }
                 else
@@ -271,7 +271,7 @@ namespace FlashCom
         SPDLOG_INFO("App::Hide");
         m_isShowing = false;
         m_ui.Hide();
-        m_dataModel->CurrentNode = m_dataModel->RootNode.get();
+        m_dataModel->ResetCurrentNode();
         m_ui.Update(View::UpdateReasonKind::Hiding);
     }
 

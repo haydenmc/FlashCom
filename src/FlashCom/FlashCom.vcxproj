@@ -101,6 +101,8 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <!-- Project Contents -->
   <ItemGroup>
+    <ClCompile Include="View\TreeViewComponent.cpp" />
+    <ClCompile Include="View\UiComponent.cpp" />
     <None Include="packages.config" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Models\ActivateAumidTreeNode.cpp" />
@@ -137,7 +139,9 @@
     <ClInclude Include="View\CompositionManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="View\TrayIcon.h" />
+    <ClInclude Include="View\TreeViewComponent.h" />
     <ClInclude Include="View\Ui.h" />
+    <ClInclude Include="View\UiComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -198,7 +198,7 @@ namespace FlashCom::View
         float maxKeyWidth{ 0 };
         float maxNameWidth{ 0 };
         float maxHeight{ 0 };
-        for (const auto& childNode : m_dataModel->CurrentNode->GetChildren())
+        for (const auto& childNode : m_dataModel->CurrentNodeChildren())
         {
             auto keyTextVisual{ CreateTextVisual(m_compositionManager,
                 keyTextFormat, std::format("{}", static_cast<char>(childNode->GetVkCode())))};
